@@ -1,126 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  // Load từ localStorage (nếu có) hoặc dùng giá trị mặc định
-  const storedUser = JSON.parse(localStorage.getItem('userProfile')) || {
-    name: 'Nguyễn Văn A',
-    email: 'nguyenvana@example.com',
-    role: 'Thành viên',
-    avatar: 'https://i.pravatar.cc/100',
-  };
-
-  const [user, setUser] = useState(storedUser);
-  const [editMode, setEditMode] = useState(false);
-  const [tempUser, setTempUser] = useState({ ...storedUser });
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Cập nhật localStorage mỗi khi user thay đổi
-    localStorage.setItem('userProfile', JSON.stringify(user));
-  }, [user]);
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:5000/api/user/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setTempUser((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+        if (!res.ok) throw new Error('Failed to fetch profile');
+
+        const data = await res.json();
+        setUser(data);
+      } catch (error) {
+        console.error('Lỗi khi lấy hồ sơ:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleEdit = () => {
-    setEditMode(true);
+    navigate('/create-profile');
   };
 
-  const handleCancel = () => {
-    setTempUser({ ...user });
-    setEditMode(false);
-  };
-
-  const handleSave = () => {
-    setUser({ ...tempUser });
-    setEditMode(false);
-  };
+  if (loading) return <div className="p-6 text-center">Đang tải hồ sơ...</div>;
+  if (!user) return <div className="p-6 text-red-500">Không thể tải hồ sơ người dùng.</div>;
 
   return (
     <div className="p-6">
-      <div className="max-w-xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="flex flex-col md:flex-row items-center p-6 space-y-4 md:space-y-0 md:space-x-6">
-          <img
-            className="h-24 w-24 rounded-full object-cover"
-            src={user.avatar}
-            alt="Avatar"
-          />
-          <div className="w-full space-y-4">
-            {/* Họ tên */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Họ tên</label>
-              <input
-                type="text"
-                name="name"
-                value={tempUser.name}
-                onChange={handleChange}
-                disabled={!editMode}
-                className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring focus:ring-blue-200 disabled:bg-gray-100"
-              />
+      <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden">
+        <div className="flex flex-col md:flex-row">
+          {/* Cột avatar + thông tin chính */}
+          <div className="md:w-1/3 bg-gray-700 text-white flex flex-col items-center justify-center p-8 space-y-4 border-r-2 border-dashed border-white">
+            <img
+              className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
+              src={user.avatar || 'https://i.pravatar.cc/100'}
+              alt="Avatar"
+            />
+            <h2 className="text-2xl font-bold">{user.full_name}</h2>
+            <p className="text-sm text-gray-100">{user.email}</p>
+            <button
+              onClick={handleEdit}
+              className="bg-white text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-blue-100 transition"
+            >
+              Chỉnh sửa hồ sơ
+            </button>
+          </div>
+
+          {/* Cột thông tin chi tiết */}
+          <div className="md:w-2/3 p-8 space-y-6">
+            <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin chi tiết</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Số điện thoại</label>
+                <div className="p-3 border rounded-md bg-gray-50">{user.phone_number || 'Chưa cập nhật'}</div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Giới tính</label>
+                <div className="p-3 border rounded-md bg-gray-50 capitalize">{user.gender || 'Chưa cập nhật'}</div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Ngày sinh</label>
+                <div className="p-3 border rounded-md bg-gray-50">
+                  {user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString('vi-VN') : 'Chưa cập nhật'}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-500 mb-1">Địa chỉ</label>
+                <div className="p-3 border rounded-md bg-gray-50">{user.address || 'Chưa cập nhật'}</div>
+              </div>
             </div>
 
-            {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={tempUser.email}
-                onChange={handleChange}
-                disabled={!editMode}
-                className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring focus:ring-blue-200 disabled:bg-gray-100"
-              />
-            </div>
-
-            {/* Vai trò */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Vai trò</label>
-              <select
-                name="role"
-                value={tempUser.role}
-                onChange={handleChange}
-                disabled={!editMode}
-                className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring focus:ring-blue-200 disabled:bg-gray-100"
-              >
-                <option>Thành viên</option>
-                <option>Quản trị viên</option>
-              </select>
-            </div>
-
-            {/* Nút hành động */}
-            <div className="flex justify-end space-x-2 pt-2">
-              {!editMode ? (
-                <button
-                  onClick={handleEdit}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                  Chỉnh sửa
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={handleSave}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                  >
-                    Lưu
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                  >
-                    Hủy
-                  </button>
-                </>
-              )}
+              <label className="block text-sm text-gray-500 mb-1">Giới thiệu</label>
+              <div className="p-3 border rounded-md bg-gray-50 whitespace-pre-line">
+                {user.bio || 'Chưa có thông tin giới thiệu.'}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
   );
 };
 

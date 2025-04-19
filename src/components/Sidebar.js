@@ -1,84 +1,108 @@
-const Sidebar = ({ sidebarOpen, toggleSidebar, setActivePage }) => {
-  const handleHomeClick = () => {
-    setActivePage('home');
-  };
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-  const handleTeamPageClick = () => {
-    setActivePage('team');
-  };
+const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
-  const handleProfileClick = () => {
-    setActivePage('profile'); // <-- Thêm hàm xử lý này
-  };
-  const handlePersonalTasksClick = () => {
-    setActivePage('personal-tasks');
-  };
-  
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/user/profile', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Không thể lấy thông tin người dùng');
+        }
+
+        const data = await response.json();
+        setUser(data);
+      } catch (error) {
+        console.error('Lỗi khi lấy thông tin người dùng:', error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const avatarSrc =
+    user?.avatar_url || 'https://i.pravatar.cc/40';
 
   return (
     <div
-      className={`w-64 bg-gray-800 text-white fixed left-0 top-0 h-full transform transition-transform z-50 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}
+      className={`${
+        sidebarOpen ? 'w-64' : 'w-20'
+      } bg-gray-800 text-white fixed left-0 top-0 h-full transition-all duration-300 z-50`}
     >
-      {/* Avatar và tên người dùng */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-600">
+      {/* Avatar + nút toggle */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-600 relative">
         <div className="flex items-center space-x-3">
           <img
-            src="https://i.pravatar.cc/40"
+            src={avatarSrc}
             alt="avatar"
-            className="w-10 h-10 rounded-full"
+            className="w-10 h-10 rounded-full object-cover"
           />
-          <div>
-            <p className="font-semibold text-sm">Xin chào</p>
-            <p className="text-xs text-gray-300">User Name</p>
-          </div>
+          {sidebarOpen && user && (
+            <div>
+              <p className="font-semibold text-sm">Mẹ mày béo</p>
+              <p className="text-xs text-gray-300 truncate max-w-[10rem]">
+                {user.full_name}
+              </p>
+            </div>
+          )}
         </div>
+
+        {/* Nút toggle */}
+        <button
+          onClick={toggleSidebar}
+          className="absolute -right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-4 py-2 rounded-full shadow"
+          title="Thu gọn"
+        >
+          <i className={`fa ${sidebarOpen ? 'fa-chevron-left' : 'fa-chevron-right'}`} />
+        </button>
       </div>
 
       {/* Menu */}
-      <ul className="mt-6">
-        <li className="mb-4">
+      <ul className="mt-6 space-y-2">
+        <li>
           <button
-            onClick={handleHomeClick}
+            onClick={() => navigate('/home')}
             className="flex items-center px-4 py-2 w-full hover:bg-gray-700 rounded"
           >
-            <i className="fa fa-home mr-3"></i> Trang Chủ
+            <i className="fa fa-home w-5 text-center mr-3" />
+            {sidebarOpen && 'Trang Chủ'}
           </button>
         </li>
-        <li className="mb-4">
+        <li>
           <button
-            onClick={handleTeamPageClick}
+            onClick={() => navigate('/team')}
             className="flex items-center px-4 py-2 w-full hover:bg-gray-700 rounded"
           >
-            <i className="fa fa-users mr-3"></i> Đội Nhóm
+            <i className="fa fa-users w-5 text-center mr-3" />
+            {sidebarOpen && 'Đội Nhóm'}
           </button>
         </li>
-        <li className="mb-4">
+        <li>
           <button
-            onClick={handleProfileClick}
+            onClick={() => navigate('/profile')}
             className="flex items-center px-4 py-2 w-full hover:bg-gray-700 rounded"
           >
-            <i className="fa fa-user mr-3"></i> Hồ Sơ
+            <i className="fa fa-user w-5 text-center mr-3" />
+            {sidebarOpen && 'Hồ Sơ'}
           </button>
         </li>
-        <li className="mb-4">
-          <button className="flex items-center px-4 py-2 w-full hover:bg-gray-700 rounded">
-            <i className="fa fa-cogs mr-3"></i> Cài Đặt
-          </button>
-        </li>
-        <li className="mb-4">
+        <li>
           <button
-            onClick={handlePersonalTasksClick}
+            onClick={() => navigate('/personal-tasks')}
             className="flex items-center px-4 py-2 w-full hover:bg-gray-700 rounded"
           >
-            <i className="fa fa-briefcase mr-3"></i> Công việc cá nhân
-          </button>
-        </li>
-
-        <li className="mb-4">
-          <button className="flex items-center px-4 py-2 w-full hover:bg-gray-700 rounded">
-            <i className="fa fa-users-cog mr-3"></i> Công việc nhóm
+            <i className="fa fa-briefcase w-5 text-center mr-3" />
+            {sidebarOpen && 'Công việc cá nhân'}
           </button>
         </li>
       </ul>
