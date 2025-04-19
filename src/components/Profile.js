@@ -45,7 +45,7 @@ const Profile = () => {
           <div className="md:w-1/3 bg-gray-700 text-white flex flex-col items-center justify-center p-8 space-y-4 border-r-2 border-dashed border-white">
             <img
               className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
-              src={user.avatar || 'https://i.pravatar.cc/100'}
+              src={user.avatar_url || 'https://i.pravatar.cc/100'}
               alt="Avatar"
             />
             <h2 className="text-2xl font-bold">{user.full_name}</h2>
