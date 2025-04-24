@@ -52,11 +52,11 @@ const Topbar = () => {
   };
 
   return (
-    <div className="w-full bg-gray-600 shadow px-6 py-3 flex justify-between items-center relative">
+    <div className="w-full px-6 py-3 flex justify-between items-center relative border-b border-gray-400">
       {/* Logo bên trái */}
       <div className="flex items-center gap-3">
         <img src="/logo.png" alt="Logo" className="h-10" />
-        <span className="text-xl font-bold text-white">TeamManager</span>
+        <span className="text-xl font-bold">TeamManager</span>
       </div>
 
       {/* Avatar và Dropdown */}
@@ -66,7 +66,7 @@ const Topbar = () => {
             onClick={() => setMenuOpen((prev) => !prev)}
             className="flex items-center gap-2 focus:outline-none"
           >
-            <span className="hidden md:inline text-white">{user.full_name}</span>
+            <span className="hidden md:inline">{user.full_name}</span>
             <img
               src={user.avatar_url || 'https://i.pravatar.cc/100'}
               alt="Avatar"

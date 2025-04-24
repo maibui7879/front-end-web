@@ -1,110 +1,45 @@
 import React, { useState } from 'react';
-import { Tabs, Form, Input, Button, message } from 'antd';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Row, Col, Button, Typography } from 'antd';
+import { LoginForm, RegisterForm } from './Forms';
+
+const { Title } = Typography;
 
 const AuthPage = () => {
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [isRegistering, setIsRegistering] = useState(false); // Quản lý trạng thái hiển thị form đăng ký hay đăng nhập
 
-  const handleRegister = async (values) => {
-    setLoading(true);
-    try {
-      await axios.post('http://localhost:5000/api/auth/register', values);
-
-      const loginResponse = await axios.post('http://localhost:5000/api/auth/login', {
-        email: values.email,
-        password: values.password,
-      });
-
-      const { token } = loginResponse.data;
-      localStorage.setItem('token', token);
-      message.success('Đăng ký & đăng nhập thành công!');
-      navigate('/create-profile');
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Lỗi đăng ký hoặc đăng nhập');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogin = async (values) => {
-    setLoading(true);
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', values);
-      const { token, message: successMessage } = response.data;
-      localStorage.setItem('token', token);
-      message.success(successMessage || 'Đăng nhập thành công!');
-      navigate('/'); // Trang chính sau khi đăng nhập
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Lỗi đăng nhập');
-    } finally {
-      setLoading(false);
-    }
+  const toggleForm = () => {
+    setIsRegistering(!isRegistering); // Đổi trạng thái giữa form đăng nhập và đăng ký
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4 w-full">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full md:w-1/3">
-        <Tabs defaultActiveKey="login" centered>
-          <Tabs.TabPane tab="Đăng nhập" key="login">
-            <Form layout="vertical" onFinish={handleLogin}>
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[
-                  { required: true, message: 'Vui lòng nhập email!' },
-                  { type: 'email', message: 'Email không hợp lệ!' },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="password"
-                label="Mật khẩu"
-                rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-              >
-                <Input.Password />
-              </Form.Item>
-              <Button type="primary" htmlType="submit" block loading={loading}>
-                Đăng nhập
-              </Button>
-            </Form>
-          </Tabs.TabPane>
+    <div className="min-h-screen bg-[#f4fafd] flex items-center justify-center px-4 py-10">
+      <Row gutter={32} className="w-full max-w-6xl">
+        <Col xs={24} md={12} className="text-center mb-6 md:mb-0 flex flex-col items-center justify-center">
+          <Title level={2} className="text-[#003366]">
+            TEAM MANAGER <br /> QUẢN LÍ TEAM - CÁ NHÂN TIÊN LỢI
+          </Title>
+          <Button
+            type="primary"
+            size="large"
+            className="mt-4 font-bold shadow-lg"
+            style={{
+              background: 'linear-gradient(to bottom, #5cb4ff, #2c85d5)',
+              border: 'none',
+            }}
+            onClick={toggleForm} // Tạo sự kiện chuyển đổi giữa đăng nhập và đăng ký
+          >
+            ➤ {isRegistering ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ TÀI KHOẢN'}
+          </Button>
+        </Col>
 
-          <Tabs.TabPane tab="Đăng ký" key="register">
-            <Form layout="vertical" onFinish={handleRegister}>
-              <Form.Item
-                name="full_name"
-                label="Họ và tên"
-                rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[
-                  { required: true, message: 'Vui lòng nhập email!' },
-                  { type: 'email', message: 'Email không hợp lệ!' },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="password"
-                label="Mật khẩu"
-                rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-              >
-                <Input.Password />
-              </Form.Item>
-              <Button type="primary" htmlType="submit" block loading={loading}>
-                Đăng ký
-              </Button>
-            </Form>
-          </Tabs.TabPane>
-        </Tabs>
-      </div>
+        <Col xs={24} md={12}>
+          {isRegistering ? (
+            <RegisterForm onSwitch={toggleForm} /> // Chuyển sang form đăng nhập khi bấm vào 'Đăng nhập'
+          ) : (
+            <LoginForm onSwitch={toggleForm} /> // Chuyển sang form đăng ký khi bấm vào 'Đăng ký'
+          )}
+        </Col>
+      </Row>
     </div>
   );
 };

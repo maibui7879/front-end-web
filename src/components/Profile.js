@@ -1,5 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Avatar,
+  Button,
+  Card,
+  Row,
+  Col,
+  Typography,
+  Skeleton,
+  Descriptions,
+  message,
+} from 'antd';
+import {
+  EditOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+
+const { Title, Text } = Typography;
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -22,6 +39,7 @@ const Profile = () => {
         setUser(data);
       } catch (error) {
         console.error('Lỗi khi lấy hồ sơ:', error);
+        message.error('Không thể tải hồ sơ người dùng.');
       } finally {
         setLoading(false);
       }
@@ -34,66 +52,84 @@ const Profile = () => {
     navigate('/create-profile');
   };
 
-  if (loading) return <div className="p-6 text-center">Đang tải hồ sơ...</div>;
-  if (!user) return <div className="p-6 text-red-500">Không thể tải hồ sơ người dùng.</div>;
+  if (loading) {
+    return (
+      <Card className="max-w-5xl mx-auto mt-10 p-6 rounded-2xl shadow-xl">
+        <Skeleton active avatar paragraph={{ rows: 6 }} />
+      </Card>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="p-6 text-center text-red-500">
+        Không thể tải hồ sơ người dùng.
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6">
-      <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden">
-        <div className="flex flex-col md:flex-row">
-          {/* Cột avatar + thông tin chính */}
-          <div className="md:w-1/3 bg-gray-700 text-white flex flex-col items-center justify-center p-8 space-y-4 border-r-2 border-dashed border-white">
-            <img
-              className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
+    <div className="p-6 min-h-screen">
+      <Card
+        bordered={false}
+        className="max-w-5xl mx-auto rounded-2xl !shadow-lg"
+        bodyStyle={{ padding: 24 }}
+      >
+        <Title level={3} className="text-center mb-8">
+          👤 Hồ sơ cá nhân
+        </Title>
+
+        <Row gutter={[32, 32]} className="items-center">
+          <Col xs={24} md={6} className="text-center">
+            <Avatar
+              size={100}
               src={user.avatar_url || 'https://i.pravatar.cc/100'}
-              alt="Avatar"
+              icon={!user.avatar_url && <UserOutlined />}
+              className="mb-4 shadow-lg"
             />
-            <h2 className="text-2xl font-bold">{user.full_name}</h2>
-            <p className="text-sm text-gray-100">{user.email}</p>
-            <button
-              onClick={handleEdit}
-              className="bg-white text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-blue-100 transition"
+            <Title level={5}>{user.full_name}</Title>
+            <Text type="secondary">{user.email}</Text>
+            <div className="mt-4">
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={handleEdit}
+                className="rounded-full px-6 bg-blue-500 hover:bg-blue-600"
+              >
+                Chỉnh sửa hồ sơ
+              </Button>
+            </div>
+          </Col>
+
+          <Col xs={24} md={18}>
+            <Descriptions
+              title={<span className="text-lg font-semibold text-gray-800">Thông tin chi tiết</span>}
+              layout="vertical"
+              column={2}
+              className="custom-descriptions"
             >
-              Chỉnh sửa hồ sơ
-            </button>
-          </div>
-
-          {/* Cột thông tin chi tiết */}
-          <div className="md:w-2/3 p-8 space-y-6">
-            <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin chi tiết</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm text-gray-500 mb-1">Số điện thoại</label>
-                <div className="p-3 border rounded-md bg-gray-50">{user.phone_number || 'Chưa cập nhật'}</div>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 mb-1">Giới tính</label>
-                <div className="p-3 border rounded-md bg-gray-50 capitalize">{user.gender || 'Chưa cập nhật'}</div>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 mb-1">Ngày sinh</label>
-                <div className="p-3 border rounded-md bg-gray-50">
-                  {user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString('vi-VN') : 'Chưa cập nhật'}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 mb-1">Địa chỉ</label>
-                <div className="p-3 border rounded-md bg-gray-50">{user.address || 'Chưa cập nhật'}</div>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm text-gray-500 mb-1">Giới thiệu</label>
-              <div className="p-3 border rounded-md bg-gray-50 whitespace-pre-line">
+              <Descriptions.Item label="📞 Số điện thoại">
+                {user.phone_number || 'Chưa cập nhật'}
+              </Descriptions.Item>
+              <Descriptions.Item label="👤 Giới tính">
+                {user.gender || 'Chưa cập nhật'}
+              </Descriptions.Item>
+              <Descriptions.Item label="🎂 Ngày sinh">
+                {user.date_of_birth
+                  ? new Date(user.date_of_birth).toLocaleDateString('vi-VN')
+                  : 'Chưa cập nhật'}
+              </Descriptions.Item>
+              <Descriptions.Item label="🏡 Địa chỉ">
+                {user.address || 'Chưa cập nhật'}
+              </Descriptions.Item>
+              <Descriptions.Item label="📝 Giới thiệu" span={2}>
                 {user.bio || 'Chưa có thông tin giới thiệu.'}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+              </Descriptions.Item>
+            </Descriptions>
+          </Col>
+        </Row>
+      </Card>
     </div>
-
   );
 };
 
