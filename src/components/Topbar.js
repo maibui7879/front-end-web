@@ -1,16 +1,19 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext'; // 👈 thêm dòng này
 
 const Topbar = () => {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const menuRef = useRef();
+  const navigate = useNavigate();
+  const { token, logout } = useContext(AuthContext); // 👈 dùng context để lấy token
 
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!token) return;
+
       try {
-        const token = localStorage.getItem('token');
         const res = await fetch('http://localhost:5000/api/user/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -27,9 +30,8 @@ const Topbar = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [token]); // 👈 gọi lại khi token thay đổi
 
-  // Đóng menu khi click bên ngoài
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -46,20 +48,18 @@ const Topbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    logout(); // 👈 dùng hàm logout từ context
     setMenuOpen(false);
     navigate('/auth');
   };
 
   return (
     <div className="w-full px-6 py-3 flex justify-between items-center relative border-b border-gray-400">
-      {/* Logo bên trái */}
       <div className="flex items-center gap-3">
         <img src="/logo.png" alt="Logo" className="h-10" />
         <span className="text-xl font-bold">TeamManager</span>
       </div>
 
-      {/* Avatar và Dropdown */}
       {user && (
         <div className="relative" ref={menuRef}>
           <button
@@ -74,7 +74,6 @@ const Topbar = () => {
             />
           </button>
 
-          {/* Dropdown menu */}
           {menuOpen && (
             <div className="absolute right-0 mt-2 w-44 bg-white rounded shadow-md py-2 z-50">
               <button

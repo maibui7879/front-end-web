@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Avatar,
@@ -11,22 +11,22 @@ import {
   Descriptions,
   message,
 } from 'antd';
-import {
-  EditOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { EditOutlined, UserOutlined } from '@ant-design/icons';
+import { AuthContext } from '../contexts/AuthContext'; // 👈 Thêm dòng này
 
 const { Title, Text } = Typography;
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext); // 👈 Lấy token từ context
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!token) return; // 👈 Nếu chưa có token thì không gọi
+
       try {
-        const token = localStorage.getItem('token');
         const res = await fetch('http://localhost:5000/api/user/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,7 +46,7 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [token]); // 👈 gọi lại nếu token thay đổi
 
   const handleEdit = () => {
     navigate('/create-profile');
@@ -103,7 +103,11 @@ const Profile = () => {
 
           <Col xs={24} md={18}>
             <Descriptions
-              title={<span className="text-lg font-semibold text-gray-800">Thông tin chi tiết</span>}
+              title={
+                <span className="text-lg font-semibold text-gray-800">
+                  Thông tin chi tiết
+                </span>
+              }
               layout="vertical"
               column={2}
               className="custom-descriptions"

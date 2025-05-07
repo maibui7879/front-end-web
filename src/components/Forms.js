@@ -1,22 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Form, Input, Button, Checkbox, Typography, Card, Row, Col, message } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext'; // Đường dẫn đúng với dự án của bạn
+
 const { Title, Text } = Typography;
 
-const LoginForm = ({ onSwitch }) => {  // Thêm prop onSwitch để chuyển giữa các form
+const LoginForm = ({ onSwitch }) => {
   const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+
   const handleLogin = async (values) => {
     setLoading(true);
     try {
       const res = await axios.post('http://localhost:5000/api/auth/login', values);
-      localStorage.setItem('token', res.data.token);
+      login(res.data.token); // Cập nhật AuthContext và localStorage
       message.success(res.data.message || 'Đăng nhập thành công!');
-      navigate('/');
+      navigate('/home');
     } catch (err) {
-      message.error(err.response?.data?.message || 'Lỗi đăng nhập');
+      form.setFields([
+        {
+          name: 'email',
+          errors: ['Sai tài khoản hoặc mật khẩu'],
+        },
+        {
+          name: 'password',
+          errors: [' '],
+        },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -31,11 +45,14 @@ const LoginForm = ({ onSwitch }) => {  // Thêm prop onSwitch để chuyển gi�
         <Text className="text-base">Đăng nhập tài khoản</Text>
       </Title>
 
-      <Form layout="vertical" onFinish={handleLogin}>
+      <Form layout="vertical" onFinish={handleLogin} form={form}>
         <Form.Item
           label="Địa chỉ email"
           name="email"
-          rules={[{ required: true, message: 'Vui lòng nhập email!' }, { type: 'email', message: 'Email không hợp lệ!' }]}
+          rules={[
+            { required: true, message: 'Vui lòng nhập email!' },
+            { type: 'email', message: 'Email không hợp lệ!' },
+          ]}
         >
           <Input prefix={<UserOutlined />} placeholder="Nhập email" />
         </Form.Item>
@@ -53,9 +70,6 @@ const LoginForm = ({ onSwitch }) => {  // Thêm prop onSwitch để chuyển gi�
             <Col>
               <Checkbox defaultChecked>Lưu đăng nhập</Checkbox>
             </Col>
-            <Col>
-              <a href="#">Quên mật khẩu?</a>
-            </Col>
           </Row>
         </Form.Item>
 
@@ -66,7 +80,7 @@ const LoginForm = ({ onSwitch }) => {  // Thêm prop onSwitch để chuyển gi�
         </Form.Item>
 
         <p className="text-center">
-          Chưa có tài khoản? <button className="text-blue-500 hover:text-blue-700" onClick={onSwitch}>Đăng ký</button> {/* Chuyển sang form đăng ký */}
+          Chưa có tài khoản? <button className="text-blue-500 hover:text-blue-700" onClick={onSwitch}>Đăng ký</button>
         </p>
       </Form>
     </Card>
@@ -75,6 +89,9 @@ const LoginForm = ({ onSwitch }) => {  // Thêm prop onSwitch để chuyển gi�
 
 const RegisterForm = ({ onSwitch }) => {
   const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleRegister = async (values) => {
     setLoading(true);
@@ -90,11 +107,25 @@ const RegisterForm = ({ onSwitch }) => {
         password: values.password,
       });
 
-      localStorage.setItem('token', loginRes.data.token);
+      const token = loginRes.data.token;
+      const userId = loginRes.data.userId;
+
+      login(token); // Cập nhật AuthContext và localStorage
+      localStorage.setItem('userId', userId); // Optional: lưu userId riêng
+
       message.success('Đăng ký & đăng nhập thành công!');
-      // Điều hướng tới trang khác nếu cần
+      navigate(`/create-profile?id=${userId}`);
     } catch (err) {
-      message.error(err.response?.data?.message || 'Lỗi đăng ký');
+      if (err.response?.status === 409) {
+        form.setFields([
+          {
+            name: 'email',
+            errors: ['Email đã được sử dụng'],
+          },
+        ]);
+      } else {
+        message.error(err.response?.data?.message || 'Lỗi đăng ký');
+      }
     } finally {
       setLoading(false);
     }
@@ -109,7 +140,7 @@ const RegisterForm = ({ onSwitch }) => {
         <Text className="text-base">Đăng ký tài khoản</Text>
       </Title>
 
-      <Form layout="vertical" onFinish={handleRegister}>
+      <Form layout="vertical" onFinish={handleRegister} form={form}>
         <Form.Item
           label="Họ và tên"
           name="full_name"
@@ -121,7 +152,10 @@ const RegisterForm = ({ onSwitch }) => {
         <Form.Item
           label="Địa chỉ email"
           name="email"
-          rules={[{ required: true, message: 'Vui lòng nhập email!' }, { type: 'email', message: 'Email không hợp lệ!' }]}
+          rules={[
+            { required: true, message: 'Vui lòng nhập email!' },
+            { type: 'email', message: 'Email không hợp lệ!' },
+          ]}
         >
           <Input prefix={<UserOutlined />} placeholder="Nhập email" />
         </Form.Item>
@@ -141,7 +175,7 @@ const RegisterForm = ({ onSwitch }) => {
         </Form.Item>
 
         <p className="mx-auto text-center">
-          Đã có tài khoản? <button className="text-blue-500 hover:text-blue-700" onClick={onSwitch}>Đăng nhập</button> {/* Chuyển sang form đăng nhập */}
+          Đã có tài khoản? <button className="text-blue-500 hover:text-blue-700" onClick={onSwitch}>Đăng nhập</button>
         </p>
       </Form>
     </Card>

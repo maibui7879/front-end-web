@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   Form,
   Input,
@@ -17,6 +17,7 @@ import { EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext'; // 👈 thêm dòng này
 
 const { Title, Text } = Typography;
 
@@ -25,11 +26,13 @@ const CreateProfilePage = () => {
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState('');
   const [initialLoading, setInitialLoading] = useState(true);
-  const token = localStorage.getItem('token');
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext); // 👈 lấy token từ context
 
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!token) return; // 👈 kiểm tra token trước khi fetch
+
       try {
         const res = await axios.get('http://localhost:5000/api/user/profile', {
           headers: { Authorization: `Bearer ${token}` },
@@ -47,7 +50,7 @@ const CreateProfilePage = () => {
       }
     };
     fetchProfile();
-  }, [form, token]);
+  }, [form, token]); // 👈 theo dõi token thay đổi
 
   const handleUpload = async (file) => {
     const formData = new FormData();
@@ -90,7 +93,7 @@ const CreateProfilePage = () => {
       });
 
       message.success('Cập nhật hồ sơ thành công!');
-      setTimeout(() => navigate('/'), 1500);
+      setTimeout(() => navigate('/home'), 1500);
     } catch (err) {
       console.error(err);
       message.error('Lỗi cập nhật hồ sơ!');
