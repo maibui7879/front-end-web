@@ -36,7 +36,7 @@ const TeamList = ({ teams, loading }) => {
                 backgroundImage: `url(${team.avatar_url || ''})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                opacity: 0.3,
+                opacity: 0.9,
                 maskImage: 'linear-gradient(to right, black 60%, transparent)',
                 WebkitMaskImage: 'linear-gradient(to left, black 60%, transparent)',
               }}

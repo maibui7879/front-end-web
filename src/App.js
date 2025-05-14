@@ -17,6 +17,7 @@ import AuthPage from './pages/AuthPage';
 import CreateProfilePage from './pages/CreateProfilePage';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import TeamDetailPage from './pages/TeamDetailPage';
+import ProfileId from './pages/ProfileId';
 const AppLayout = ({ children, sidebarOpen, toggleSidebar }) => (
   <div
     className="min-h-screen flex"
@@ -115,6 +116,7 @@ const Main = ({ sidebarOpen, toggleSidebar }) => {
               }
             />
             <Route path="/create-profile" element={<CreateProfilePage />} />
+            <Route path="/profile/:id" element={<ProfileId />} />
           </Routes>
         </AppLayout>
       )}

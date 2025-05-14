@@ -33,6 +33,19 @@ const Sidebar = () => {
 
   return (
     <div className="w-20 md:w-64 text-gray-700 bg-white/60 border-r border-gray-300 fixed top-0 left-0 h-full transition-all duration-300 z-50 backdrop-blur-lg shadow-md rounded-tr-2xl">
+      {user && (
+        <div className="flex flex-col items-center md:flex-row md:items-center gap-3 px-4 py-4">
+          <img
+            src={user.avatar_url || 'https://i.pravatar.cc/100'}
+            alt="Avatar"
+            className="h-10 w-10 rounded-full object-cover border-2 border-white shadow"
+          />
+          <span className="hidden md:inline text-base font-semibold">{user.full_name}</span>
+        </div>
+      )}
+
+      <div className="border-t border-gray-300 mx-4" />
+
       <ul className="mt-6 space-y-2 px-3">
         <SidebarItem icon="fa-home" label="Trang Chủ" to="/home" />
         <SidebarItem icon="fa-users" label="Đội Nhóm" to="/team" />

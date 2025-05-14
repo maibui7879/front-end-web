@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext'; // 👈 thêm dòng này
+import { AuthContext } from '../contexts/AuthContext';
+import SearchUserBar from './SearchUserBar';
 
 const Topbar = () => {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
   const navigate = useNavigate();
-  const { token, logout } = useContext(AuthContext); // 👈 dùng context để lấy token
+  const { token, logout } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -30,7 +31,7 @@ const Topbar = () => {
     };
 
     fetchProfile();
-  }, [token]); // 👈 gọi lại khi token thay đổi
+  }, [token]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -48,16 +49,17 @@ const Topbar = () => {
   };
 
   const handleLogout = () => {
-    logout(); // 👈 dùng hàm logout từ context
+    logout();
     setMenuOpen(false);
     navigate('/auth');
   };
 
   return (
-    <div className="w-full px-6 py-3 flex justify-between items-center relative border-b border-gray-400">
-      <div className="flex items-center gap-3">
+    <div className="w-full px-6 py-3 flex justify-between items-center relative border-b border-gray-400 z-[100] bg-white">
+      <div className="flex items-center gap-4">
         <img src="/logo.png" alt="Logo" className="h-10" />
         <span className="text-xl font-bold">TeamManager</span>
+        <SearchUserBar />
       </div>
 
       {user && (
