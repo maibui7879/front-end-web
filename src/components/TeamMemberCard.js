@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Card, Avatar, Typography, Dropdown, Menu, Modal, Input, Select, message, DatePicker, Button } from 'antd';
+import { Card, Avatar, Typography, Dropdown, Menu, Modal, Input, Select, message, Button } from 'antd';
 import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
-import dayjs from 'dayjs';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import axios from 'axios';
 
@@ -13,16 +12,8 @@ const { Option } = Select;
 const TeamMemberCard = ({ member, teamId, onChange }) => {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [roleModalVisible, setRoleModalVisible] = useState(false);
-  const [taskModalVisible, setTaskModalVisible] = useState(false);
   const [newRole, setNewRole] = useState(member.role);
   const [forbiddenModal, setForbiddenModal] = useState(false);
-  const [taskInfo, setTaskInfo] = useState({
-    title: '',
-    description: '',
-    start_time: null,
-    end_time: null,
-    priority: 'medium',
-  });
 
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
@@ -41,26 +32,26 @@ const TeamMemberCard = ({ member, teamId, onChange }) => {
     fetchUserProfile();
   }, [member.id, token]);
 
-  const handleRemoveMember = async () => {
-    Modal.confirm({
-      title: 'Xác nhận xóa thành viên',
-      icon: <ExclamationCircleOutlined />,
-      content: 'Bạn có chắc muốn xóa thành viên này khỏi nhóm?',
-      okText: 'Xóa',
-      okType: 'danger',
-      cancelText: 'Hủy',
-      onOk: async () => {
-        try {
-          await axios.delete(`http://localhost:5000/api/teams/member/${teamId}/remove/${member.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          message.success('Đã xóa thành viên');
-          onChange();
-        } catch (err) {
-          message.error('Lỗi khi xóa thành viên');
-        }
-      },
-    });
+  const confirmRemoveMember = async () => {
+    console.log('Click gọi confirmRemoveMember');
+    try {
+      const res = await axios.delete(`http://localhost:5000/api/teams/member/${teamId}/remove/${member.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log('Response:', res);
+      
+      if (res.status === 200) {
+        message.success('Đã xóa thành viên');
+        onChange();
+      } else {
+        console.error('Lỗi từ server:', res);
+        message.error('Lỗi khi xóa thành viên');
+      }
+    } catch (err) {
+      console.error('Lỗi khi gửi request:', err);
+      message.error('Lỗi khi xóa thành viên');
+    }
   };
 
   const handleChangeRole = async () => {
@@ -86,26 +77,6 @@ const TeamMemberCard = ({ member, teamId, onChange }) => {
     }
   };
 
-  const handleAssignTask = async () => {
-    try {
-      await axios.post('http://localhost:5000/api/tasks', {
-        ...taskInfo,
-        user_id: member.id,
-        team_id: teamId,
-        start_time: dayjs(taskInfo.start_time).format('YYYY-MM-DD HH:mm:ss'),
-        end_time: dayjs(taskInfo.end_time).format('YYYY-MM-DD HH:mm:ss'),
-        status: 'todo',
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      message.success('Giao task thành công');
-      setTaskModalVisible(false);
-      onChange();
-    } catch (err) {
-      message.error('Lỗi khi giao task');
-    }
-  };
-
   const menu = (
     <Menu>
       <Menu.Item key="1" onClick={() => navigate(`/profile/${member.id}`)}>
@@ -114,10 +85,7 @@ const TeamMemberCard = ({ member, teamId, onChange }) => {
       <Menu.Item key="2" onClick={() => setRoleModalVisible(true)}>
         Thay đổi vai trò
       </Menu.Item>
-      <Menu.Item key="3" onClick={() => setTaskModalVisible(true)}>
-        Giao task
-      </Menu.Item>
-      <Menu.Item key="4" danger onClick={handleRemoveMember}>
+      <Menu.Item key="4" danger onClick={confirmRemoveMember}>
         Xóa thành viên khỏi nhóm
       </Menu.Item>
     </Menu>
@@ -151,49 +119,6 @@ const TeamMemberCard = ({ member, teamId, onChange }) => {
         <Select className="w-full" value={newRole} onChange={setNewRole}>
           <Option value="member">Thành viên</Option>
           <Option value="admin">Admin</Option>
-        </Select>
-      </Modal>
-
-      <Modal
-        title="Giao Task"
-        open={taskModalVisible}
-        onCancel={() => setTaskModalVisible(false)}
-        onOk={handleAssignTask}
-      >
-        <Input
-          placeholder="Tiêu đề"
-          className="mb-2"
-          value={taskInfo.title}
-          onChange={(e) => setTaskInfo({ ...taskInfo, title: e.target.value })}
-        />
-        <Input.TextArea
-          placeholder="Mô tả"
-          className="mb-2"
-          value={taskInfo.description}
-          onChange={(e) => setTaskInfo({ ...taskInfo, description: e.target.value })}
-        />
-        <DatePicker
-          showTime
-          className="w-full mb-2"
-          placeholder="Thời gian bắt đầu"
-          value={taskInfo.start_time}
-          onChange={(value) => setTaskInfo({ ...taskInfo, start_time: value })}
-        />
-        <DatePicker
-          showTime
-          className="w-full mb-2"
-          placeholder="Thời gian kết thúc"
-          value={taskInfo.end_time}
-          onChange={(value) => setTaskInfo({ ...taskInfo, end_time: value })}
-        />
-        <Select
-          className="w-full"
-          value={taskInfo.priority}
-          onChange={(value) => setTaskInfo({ ...taskInfo, priority: value })}
-        >
-          <Option value="low">Thấp</Option>
-          <Option value="medium">Trung bình</Option>
-          <Option value="high">Cao</Option>
         </Select>
       </Modal>
 

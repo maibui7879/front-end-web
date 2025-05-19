@@ -4,11 +4,17 @@ import { useNavigate } from 'react-router-dom';
 const Sidebar = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [teams, setTeams] = useState([]);
+  const [teamLoading, setTeamLoading] = useState(true);
+  const [teamError, setTeamError] = useState(false);
+  const [showTeams, setShowTeams] = useState(false); // toggle hiển thị team
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:5000/api/user/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -20,7 +26,30 @@ const Sidebar = () => {
       }
     };
 
+    const fetchTeams = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/teams', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (!data.items || data.items.length === 0) {
+          setTeamError(true);
+          setTeams([]);
+        } else {
+          setTeams(data.items);
+          setTeamError(false);
+        }
+      } catch (err) {
+        setTeamError(true);
+        setTeams([]);
+      } finally {
+        setTeamLoading(false);
+      }
+    };
+
     fetchProfile();
+    fetchTeams();
   }, []);
 
   const handleLogout = () => {
@@ -29,6 +58,11 @@ const Sidebar = () => {
     setUser(null);
     navigate('/');
     window.location.reload();
+  };
+
+  // Hàm toggle hiển thị team
+  const toggleTeams = () => {
+    setShowTeams(prev => !prev);
   };
 
   return (
@@ -48,7 +82,54 @@ const Sidebar = () => {
 
       <ul className="mt-6 space-y-2 px-3">
         <SidebarItem icon="fa-home" label="Trang Chủ" to="/home" />
-        <SidebarItem icon="fa-users" label="Đội Nhóm" to="/team" />
+
+        {/* Đội Nhóm với nút toggle */}
+        <li>
+          <button
+            onClick={toggleTeams}
+            className="flex items-center px-4 py-3 w-full rounded hover:text-blue-700 transition text-lg font-medium"
+          >
+            <i className={`fa fa-users w-6 text-[18px] text-center mr-4`} />
+            <span className="hidden md:inline">Đội Nhóm</span>
+            <i
+              className={`fa ml-auto mr-1 transition-transform duration-200 ${
+                showTeams ? 'fa-chevron-up' : 'fa-chevron-down'
+              }`}
+              aria-hidden="true"
+            />
+          </button>
+        </li>
+
+        {/* Hiển thị team nếu toggle = true */}
+        {showTeams && (
+          <>
+            {teamLoading && (
+              <li className="text-sm text-gray-500 ml-2 md:ml-4">Đang tải nhóm...</li>
+            )}
+            {!teamLoading && teamError && (
+              <li className="text-sm text-red-500 ml-2 md:ml-4">Không thể tải nhóm</li>
+            )}
+            {!teamLoading && !teamError && teams.length === 0 && (
+              <li className="text-sm text-gray-500 ml-2 md:ml-4">Chưa có nhóm nào</li>
+            )}
+            {!teamLoading && !teamError && teams.length > 0 &&
+              teams.slice(0, 5).map(team => (
+                <li
+                  key={team.id}
+                  className="ml-6 md:ml-8 flex items-center cursor-pointer hover:text-blue-700 transition text-sm font-medium"
+                  onClick={() => navigate(`/teams/${team.id}`)}
+                >
+                  <img
+                    src={team.avatar_url || 'https://i.pravatar.cc/40?u=' + team.id}
+                    alt={`${team.name} avatar`}
+                    className="h-6 w-6 rounded-full object-cover mr-2 border border-gray-300"
+                  />
+                  {team.name}
+                </li>
+              ))}
+          </>
+        )}
+
         <SidebarItem icon="fa-user" label="Hồ Sơ" to="/profile" />
         <SidebarItem icon="fa-briefcase" label="Công việc cá nhân" to="/personal-tasks" />
       </ul>

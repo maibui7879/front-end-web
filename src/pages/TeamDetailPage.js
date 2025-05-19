@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { Typography, Spin, message, Button, Divider } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
@@ -7,24 +7,30 @@ import TeamCreator from '../components/TeamCreator';
 import TeamMemberList from '../components/TeamMemberList';
 import InviteMemberModal from '../components/InviteMemberModal';
 import TeamSetting from '../components/TeamSetting';
+import TeamTaskList from '../components/TeamTaskList';
 
 const { Title, Text } = Typography;
 
 const TeamDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [team, setTeam] = useState(null);
   const [creator, setCreator] = useState(null);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
-  const [showMembers, setShowMembers] = useState(true);
-  const [showSetting, setShowSetting] = useState(false);
+
+  const activeTab = searchParams.get('tab') || 'members';
 
   useEffect(() => {
     fetchTeamDetail();
   }, [id]);
+
+  const setActiveTab = (tab) => {
+    setSearchParams({ tab });
+  };
 
   const fetchTeamDetail = async () => {
     setLoading(true);
@@ -80,12 +86,16 @@ const TeamDetailPage = () => {
     );
   }
 
-  const SidebarButton = ({ icon, label, onClick, danger }) => (
+  const SidebarButton = ({ icon, label, onClick, danger, isActive }) => (
     <li>
       <button
         onClick={onClick}
         className={`flex items-center px-4 py-3 w-full rounded transition font-medium text-base ${
-          danger ? 'text-red-500 hover:text-red-600' : 'hover:text-blue-700'
+          danger
+            ? 'text-red-500 hover:text-red-600'
+            : isActive
+            ? 'text-blue-700 font-semibold'
+            : 'hover:text-blue-700'
         }`}
       >
         <i className={`fa ${icon} w-6 text-[18px] text-center mr-4`} />
@@ -104,20 +114,21 @@ const TeamDetailPage = () => {
           <TeamCreator creator={creator} />
         </div>
 
-        {!showSetting && showMembers && (
+        {activeTab === 'members' && (
           <div className="mt-6">
-            <TeamMemberList members={members} onInviteClick={() => setInviteModalOpen(true)} teamId={team.id}/>
+            <TeamMemberList members={members} onInviteClick={() => setInviteModalOpen(true)} teamId={team.id} />
           </div>
         )}
 
-        {showSetting && (
+        {activeTab === 'tasks' && (
           <div className="mt-6">
-            <TeamSetting
-              team={team}
-              members={members}
-              onClose={() => setShowSetting(false)}
-              onSave={fetchTeamDetail}
-            />
+            <TeamTaskList teamId={team.id} />
+          </div>
+        )}
+
+        {activeTab === 'setting' && (
+          <div className="mt-6">
+            <TeamSetting team={team} members={members} onClose={() => setActiveTab('members')} onSave={fetchTeamDetail} />
           </div>
         )}
 
@@ -145,23 +156,20 @@ const TeamDetailPage = () => {
           <SidebarButton
             icon="fa-users"
             label="Xem thành viên"
-            onClick={() => {
-              setShowMembers((prev) => !prev);
-              setShowSetting(false);
-            }}
+            isActive={activeTab === 'members'}
+            onClick={() => setActiveTab('members')}
           />
           <SidebarButton
             icon="fa-tasks"
             label="Xem task"
-            onClick={() => {}}
+            isActive={activeTab === 'tasks'}
+            onClick={() => setActiveTab('tasks')}
           />
           <SidebarButton
             icon="fa-cog"
             label="Cài đặt"
-            onClick={() => {
-              setShowSetting((prev) => !prev);
-              setShowMembers(false);
-            }}
+            isActive={activeTab === 'setting'}
+            onClick={() => setActiveTab('setting')}
           />
           <SidebarButton icon="fa-trash" label="Xóa nhóm" danger onClick={handleDeleteTeam} />
         </ul>

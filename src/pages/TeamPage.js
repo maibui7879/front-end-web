@@ -25,7 +25,7 @@ const TeamPage = () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      setTeams(res.data);
+      setTeams(res.data.items);
     } catch {
       message.error('Không thể tải danh sách nhóm');
     } finally {

@@ -33,7 +33,7 @@ const ProfileId = () => {
         if (!res.ok) throw new Error('Failed to fetch profile');
 
         const data = await res.json();
-        setUser(data.profile); // Truy xuất profile từ response
+        setUser(data.profile);
       } catch (error) {
         console.error('Lỗi khi lấy hồ sơ:', error);
         message.error('Không thể tải hồ sơ người dùng.');
@@ -80,8 +80,8 @@ const ProfileId = () => {
               icon={!user.avatar_url && <UserOutlined />}
               className="mb-4 shadow-lg"
             />
-            <Title level={5}>{user.full_name}</Title>
-            <Text type="secondary">{user.email}</Text>
+            <Title level={5}>{user.full_name || 'Không tên'}</Title>
+            <Text type="secondary">{user.email || 'Chưa cập nhật email'}</Text>
           </Col>
 
           <Col xs={24} md={18}>
