@@ -7,7 +7,7 @@ const Sidebar = () => {
   const [teams, setTeams] = useState([]);
   const [teamLoading, setTeamLoading] = useState(true);
   const [teamError, setTeamError] = useState(false);
-  const [showTeams, setShowTeams] = useState(false); // toggle hiển thị team
+  const [showTeams, setShowTeams] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -60,76 +60,87 @@ const Sidebar = () => {
     window.location.reload();
   };
 
-  // Hàm toggle hiển thị team
-  const toggleTeams = () => {
+  const toggleTeams = (e) => {
+    e.stopPropagation();
     setShowTeams(prev => !prev);
   };
 
+  const goToTeamsPage = () => {
+    navigate('/team');
+  };
+
   return (
-    <div className="w-20 md:w-64 text-gray-700 bg-white/60 border-r border-gray-300 fixed top-0 left-0 h-full transition-all duration-300 z-50 backdrop-blur-lg shadow-md rounded-tr-2xl">
+    <div className="w-20 md:w-64 text-sm text-gray-700 bg-white/60 border-r border-gray-300 fixed top-0 left-0 h-full transition-all duration-300 z-50 backdrop-blur-lg shadow-md rounded-tr-2xl">
       {user && (
-        <div className="flex flex-col items-center md:flex-row md:items-center gap-3 px-4 py-4">
+        <div className="flex flex-col items-center md:flex-row md:items-center gap-2 px-4 py-4">
           <img
             src={user.avatar_url || 'https://i.pravatar.cc/100'}
             alt="Avatar"
-            className="h-10 w-10 rounded-full object-cover border-2 border-white shadow"
+            className="h-8 w-8 rounded-full object-cover border-2 border-white shadow"
           />
-          <span className="hidden md:inline text-base font-semibold">{user.full_name}</span>
+          <span className="hidden md:inline text-sm font-semibold">{user.full_name}</span>
         </div>
       )}
 
       <div className="border-t border-gray-300 mx-4" />
 
-      <ul className="mt-6 space-y-2 px-3">
+      <ul className="mt-4 space-y-1 px-3">
+        <p className="px-4 py-2 text-gray-500 text-xs uppercase tracking-wide">Chung</p>
         <SidebarItem icon="fa-home" label="Trang Chủ" to="/home" />
+      </ul>
 
-        {/* Đội Nhóm với nút toggle */}
+      <ul className="mt-4 space-y-1 px-3">
+        <p className="px-4 py-2 text-gray-500 text-xs uppercase tracking-wide">Đội nhóm</p>
         <li>
-          <button
-            onClick={toggleTeams}
-            className="flex items-center px-4 py-3 w-full rounded hover:text-blue-700 transition text-lg font-medium"
+          <div
+            onClick={goToTeamsPage}
+            className="flex items-center px-4 py-2 w-full rounded cursor-pointer hover:bg-gray-100 font-medium"
           >
-            <i className={`fa fa-users w-6 text-[18px] text-center mr-4`} />
-            <span className="hidden md:inline">Đội Nhóm</span>
-            <i
-              className={`fa ml-auto mr-1 transition-transform duration-200 ${
-                showTeams ? 'fa-chevron-up' : 'fa-chevron-down'
-              }`}
-              aria-hidden="true"
-            />
-          </button>
+            <i className="fa fa-users w-5 text-center mr-3" />
+            <span className="hidden md:inline">Tất cả nhóm</span>
+            <button
+              onClick={toggleTeams}
+              className="ml-auto text-gray-600 hover:text-blue-700"
+            >
+              <i
+                className={`fa text-xs ${showTeams ? 'fa-chevron-up' : 'fa-chevron-down'}`}
+              />
+            </button>
+          </div>
         </li>
 
-        {/* Hiển thị team nếu toggle = true */}
         {showTeams && (
           <>
             {teamLoading && (
-              <li className="text-sm text-gray-500 ml-2 md:ml-4">Đang tải nhóm...</li>
+              <li className="text-gray-500 ml-4 text-xs">Đang tải nhóm...</li>
             )}
             {!teamLoading && teamError && (
-              <li className="text-sm text-red-500 ml-2 md:ml-4">Không thể tải nhóm</li>
+              <li className="text-red-500 ml-4 text-xs">Không có nhóm</li>
             )}
             {!teamLoading && !teamError && teams.length === 0 && (
-              <li className="text-sm text-gray-500 ml-2 md:ml-4">Chưa có nhóm nào</li>
+              <li className="text-gray-500 ml-4 text-xs">Chưa có nhóm nào</li>
             )}
             {!teamLoading && !teamError && teams.length > 0 &&
               teams.slice(0, 5).map(team => (
                 <li
                   key={team.id}
-                  className="ml-6 md:ml-8 flex items-center cursor-pointer hover:text-blue-700 transition text-sm font-medium"
+                  className="ml-6 md:ml-8 flex items-center cursor-pointer hover:text-blue-700 transition text-sm"
                   onClick={() => navigate(`/teams/${team.id}`)}
                 >
                   <img
                     src={team.avatar_url || 'https://i.pravatar.cc/40?u=' + team.id}
                     alt={`${team.name} avatar`}
-                    className="h-6 w-6 rounded-full object-cover mr-2 border border-gray-300"
+                    className="h-5 w-5 rounded-full object-cover mr-2 border border-gray-300"
                   />
                   {team.name}
                 </li>
               ))}
           </>
         )}
+      </ul>
 
+      <ul className="mt-4 space-y-1 px-3">
+        <p className="px-4 py-2 text-gray-500 text-xs uppercase tracking-wide">Tài khoản</p>
         <SidebarItem icon="fa-user" label="Hồ Sơ" to="/profile" />
         <SidebarItem icon="fa-briefcase" label="Công việc cá nhân" to="/personal-tasks" />
       </ul>
@@ -139,9 +150,9 @@ const Sidebar = () => {
       <div className="absolute bottom-5 w-full px-3">
         <button
           onClick={handleLogout}
-          className="flex items-center px-4 py-3 w-full rounded text-red-500 hover:text-red-600 transition font-medium"
+          className="flex items-center px-4 py-2 w-full rounded text-red-500 hover:text-red-600 font-medium"
         >
-          <i className="fa fa-sign-out w-6 text-[18px] text-center mr-4" />
+          <i className="fa fa-sign-out w-5 text-center mr-3" />
           <span className="hidden md:inline">Đăng xuất</span>
         </button>
       </div>
@@ -156,9 +167,9 @@ const SidebarItem = ({ icon, label, to }) => {
     <li>
       <button
         onClick={() => navigate(to)}
-        className="flex items-center px-4 py-3 w-full rounded hover:text-blue-700 transition text-lg font-medium"
+        className="flex items-center px-4 py-2 w-full rounded hover:text-blue-700 transition text-sm font-medium"
       >
-        <i className={`fa ${icon} w-6 text-[18px] text-center mr-4`} />
+        <i className={`fa ${icon} w-5 text-center mr-3`} />
         <span className="hidden md:inline">{label}</span>
       </button>
     </li>

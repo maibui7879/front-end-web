@@ -1,22 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Button, Card, message, Spin, Typography } from 'antd';
+import { Button, Table, Tag, Typography, message, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import AssignTaskModal from './AssignTaskModal';
 import CreateTaskModal from './CreateTaskModal';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
-const getPriorityColor = (priority) => {
+const getTagBgColor = (priority) => {
   switch (priority?.toLowerCase()) {
-    case 'high':
-      return 'bg-red-300';
-    case 'medium':
-      return 'bg-yellow-300';
-    case 'low':
-      return 'bg-green-300';
-    default:
-      return 'bg-gray-300';
+    case 'high': return '#f87171';
+    case 'medium': return '#fde68a';
+    case 'low': return '#86efac';
+    default: return '#d1d5db';
+  }
+};
+
+const getTagTextColor = (priority) => {
+  switch (priority?.toLowerCase()) {
+    case 'high': return '#7f1d1d';
+    case 'medium': return '#92400e';
+    case 'low': return '#166534';
+    default: return '#374151';
   }
 };
 
@@ -97,8 +102,77 @@ const TeamTaskList = ({ teamId }) => {
     setModalVisible(true);
   };
 
+  const columns = [
+    {
+      title: 'Tiêu đề',
+      dataIndex: 'title',
+      key: 'title',
+      render: (text) => <strong>{text}</strong>,
+    },
+    {
+      title: 'Mô tả',
+      dataIndex: 'description',
+      key: 'description',
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
+      title: 'Ưu tiên',
+      dataIndex: 'priority',
+      key: 'priority',
+    },
+    {
+      title: 'Bắt đầu',
+      dataIndex: 'start_time',
+      key: 'start_time',
+      render: (time) => new Date(time).toLocaleString(),
+    },
+    {
+      title: 'Kết thúc',
+      dataIndex: 'end_time',
+      key: 'end_time',
+      render: (time) => new Date(time).toLocaleString(),
+    },
+    {
+      title: 'Phân công',
+      key: 'assigned',
+      render: (_, record) => {
+        const entries = assignHistory[record.id] || [];
+        return entries.length === 0 ? (
+          <i className="text-gray-500">Chưa phân công</i>
+        ) : (
+          <Tag
+            style={{
+              backgroundColor: getTagBgColor(record.priority),
+              color: getTagTextColor(record.priority),
+              border: `1px solid ${getTagTextColor(record.priority)}`,
+              fontWeight: 600,
+            }}
+          >
+            {entries[0].full_name}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: 'Hành động',
+      key: 'action',
+      render: (_, record) => (
+        <Button
+          type="link"
+          onClick={() => openAssignModal(record.id)}
+        >
+          {assignHistory[record.id]?.length ? 'Sửa phân công' : 'Phân công'}
+        </Button>
+      ),
+    },
+  ];
+
   return (
-    <div className="p-4">
+    <div className="p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-4">
         <Title level={3} className="!mb-0">Danh sách công việc</Title>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>
@@ -107,53 +181,14 @@ const TeamTaskList = ({ teamId }) => {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <Spin size="large" />
-        </div>
+        <div className="flex justify-center py-20"><Spin size="large" /></div>
       ) : (
-        <div className="flex flex-wrap -mx-2">
-          {tasks.map((task) => {
-            const isAssigned = (assignHistory[task.id] || []).length > 0;
-            return (
-              <div key={task.id} className="w-full md:w-1/3 px-2 mb-4">
-                <Card
-                  title={<span className="text-base font-semibold">{task.title}</span>}
-                  className={`shadow rounded-xl ${getPriorityColor(task.priority)}`}
-                  actions={[
-                    <button
-                      key="assign"
-                      className="w-full py-2 font-medium hover:opacity-90"
-                      onClick={() => openAssignModal(task.id)}
-                    >
-                      {isAssigned ? 'Sửa phân công' : 'Phân công'}
-                    </button>
-                  ]}
-                >
-                  <div className="space-y-1 text-sm">
-                    <Text strong>Mô tả:</Text> <Text>{task.description}</Text><br />
-                    <Text strong>Trạng thái:</Text> <Text>{task.status}</Text><br />
-                    <Text strong>Ưu tiên:</Text> <Text>{task.priority}</Text><br />
-                    <Text strong>Bắt đầu:</Text> <Text>{new Date(task.start_time).toLocaleString()}</Text><br />
-                    <Text strong>Kết thúc:</Text> <Text>{new Date(task.end_time).toLocaleString()}</Text>
-                  </div>
-
-                  <div className="mt-3 text-sm">
-                    <Text strong>Phân công:</Text>
-                    {(assignHistory[task.id] || []).length === 0 ? (
-                      <div className="mt-1 italic text-gray-600">chưa có phân công </div>
-                    ) : (
-                      <ul className="list-disc list-inside mt-1">
-                        {assignHistory[task.id].map((entry, idx) => (
-                          <li key={idx}>{entry.full_name}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </Card>
-              </div>
-            );
-          })}
-        </div>
+        <Table
+          dataSource={tasks}
+          columns={columns}
+          rowKey="id"
+          pagination={{ pageSize: 6 }}
+        />
       )}
 
       <AssignTaskModal

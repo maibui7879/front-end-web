@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Button, Typography, message } from 'antd';
+import { Button, Typography, message, Table, Avatar } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import CreateTeamModal from '../components/CreateTeamModal';
-import TeamList from '../components/TeamList';
 
 const { Title } = Typography;
 
@@ -13,6 +13,7 @@ const TeamPage = () => {
   const [newTeamName, setNewTeamName] = useState('');
   const [newTeamDescription, setNewTeamDescription] = useState('');
   const [newTeamId, setNewTeamId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTeams();
@@ -38,7 +39,7 @@ const TeamPage = () => {
       message.warning('Vui lòng nhập đầy đủ thông tin nhóm');
       return;
     }
-  
+
     try {
       const res = await axios.post(
         'http://localhost:5000/api/teams',
@@ -51,8 +52,8 @@ const TeamPage = () => {
       );
       setNewTeamId(res.data.id);
       message.success('Tạo nhóm thành công');
-      fetchTeams(); // Fetch teams again to update the list
-      nextStep(); // chuyển sang bước tiếp theo sau khi tạo nhóm thành công
+      fetchTeams();
+      nextStep();
     } catch {
       message.error('Lỗi khi tạo nhóm');
     }
@@ -66,10 +67,31 @@ const TeamPage = () => {
     fetchTeams();
   };
 
+  const columns = [
+    {
+      title: 'Avatar',
+      dataIndex: 'avatar_url',
+      key: 'avatar',
+      render: (url, record) => (
+        <Avatar src={url || `https://i.pravatar.cc/40?u=${record.id}`} />
+      ),
+    },
+    {
+      title: 'Tên nhóm',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Mô tả',
+      dataIndex: 'description',
+      key: 'description',
+    },
+  ];
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <Title level={3}>Nhóm của bạn</Title>
+        <Title level={3}>Danh sách nhóm</Title>
         <Button type="primary" onClick={() => setShowCreateModal(true)}>
           Tạo nhóm
         </Button>
@@ -87,7 +109,17 @@ const TeamPage = () => {
         onAvatarUploaded={handleAvatarUploaded}
       />
 
-      <TeamList teams={teams} loading={loading} />
+      <Table
+        dataSource={teams}
+        columns={columns}
+        rowKey="id"
+        loading={loading}
+        pagination={{ pageSize: 5 }}
+        onRow={(record) => ({
+          onClick: () => navigate(`/teams/${record.id}`),
+          style: { cursor: 'pointer' },
+        })}
+      />
     </div>
   );
 };
