@@ -1,6 +1,6 @@
-import React from 'react';
-import { Card, Typography, Empty, Spin, Avatar } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { Card, Typography, Empty, Spin, Avatar } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -33,12 +33,13 @@ const TeamList = ({ teams, loading }) => {
             <div
               className="absolute right-0 top-0 h-full w-1/4"
               style={{
-                backgroundImage: `url(${team.avatar_url || ''})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundImage: `url(${team.avatar_url || ""})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
                 opacity: 0.9,
-                maskImage: 'linear-gradient(to right, black 60%, transparent)',
-                WebkitMaskImage: 'linear-gradient(to left, black 60%, transparent)',
+                maskImage: "linear-gradient(to right, black 60%, transparent)",
+                WebkitMaskImage:
+                  "linear-gradient(to left, black 60%, transparent)",
               }}
             />
 
@@ -51,8 +52,12 @@ const TeamList = ({ teams, loading }) => {
                 {team.name?.charAt(0).toUpperCase()}
               </Avatar>
               <div>
-                <Title level={4} className="mb-1">{team.name}</Title>
-                <Text type="secondary" className="line-clamp-2">{team.description}</Text>
+                <Title level={4} className="mb-1">
+                  {team.name}
+                </Title>
+                <Text type="secondary" className="line-clamp-2">
+                  {team.description}
+                </Text>
               </div>
             </div>
           </div>

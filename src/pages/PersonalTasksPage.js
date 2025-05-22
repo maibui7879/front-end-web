@@ -87,7 +87,7 @@ const PersonalTaskPage = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(formattedTask),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -182,7 +182,10 @@ const PersonalTaskPage = () => {
       </div>
 
       {selectedTask && (
-        <TaskDetails task={selectedTask} onClose={() => setSelectedTask(null)} />
+        <TaskDetails
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+        />
       )}
     </div>
   );

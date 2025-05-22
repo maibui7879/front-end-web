@@ -1,7 +1,12 @@
-import React from 'react';
-import { Input } from 'antd';
+import React from "react";
+import { Input } from "antd";
 
-const StepOne = ({ teamName, teamDescription, setTeamName, setTeamDescription }) => {
+const StepOne = ({
+  teamName,
+  teamDescription,
+  setTeamName,
+  setTeamDescription,
+}) => {
   return (
     <div className="space-y-3">
       <Input

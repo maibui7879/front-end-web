@@ -48,56 +48,57 @@ const TaskForm = ({ task, onSave, onCancel }) => {
 
   return (
     <Form form={form} layout="vertical" onFinish={handleSubmit}>
-  <Form.Item
-    label="Tiêu đề"
-    name="title"
-    rules={[{ required: true, message: "Vui lòng nhập tiêu đề" }]}
-  >
-    <Input />
-  </Form.Item>
+      <Form.Item
+        label="Tiêu đề"
+        name="title"
+        rules={[{ required: true, message: "Vui lòng nhập tiêu đề" }]}
+      >
+        <Input />
+      </Form.Item>
 
-  <Form.Item
-    label="Thời gian"
-    name="timeRange"
-    rules={[{ required: true, message: "Vui lòng chọn thời gian bắt đầu và kết thúc" }]}
-  >
-    <DatePicker.RangePicker showTime format="YYYY-MM-DD HH:mm:ss" />
-  </Form.Item>
+      <Form.Item
+        label="Thời gian"
+        name="timeRange"
+        rules={[
+          {
+            required: true,
+            message: "Vui lòng chọn thời gian bắt đầu và kết thúc",
+          },
+        ]}
+      >
+        <DatePicker.RangePicker showTime format="YYYY-MM-DD HH:mm:ss" />
+      </Form.Item>
 
-  <Form.Item label="Mô tả" name="description">
-    <TextArea rows={3} />
-  </Form.Item>
+      <Form.Item label="Mô tả" name="description">
+        <TextArea rows={3} />
+      </Form.Item>
 
-  <Form.Item
-    label="Trạng thái"
-    name="status"
-    rules={[{ required: true }]}
-  >
-    <Select>
-      <Option value="todo">Todo</Option>
-      <Option value="in_progress">In Progress</Option>
-      <Option value="done">Done</Option>
-    </Select>
-  </Form.Item>
+      <Form.Item label="Trạng thái" name="status" rules={[{ required: true }]}>
+        <Select>
+          <Option value="todo">Todo</Option>
+          <Option value="in_progress">In Progress</Option>
+          <Option value="done">Done</Option>
+        </Select>
+      </Form.Item>
 
-  <Form.Item
-    label="Độ ưu tiên"
-    name="priority"
-    rules={[{ required: true }]}
-  >
-    <Select>
-      <Option value="low">Low</Option>
-      <Option value="medium">Medium</Option>
-      <Option value="high">High</Option>
-    </Select>
-  </Form.Item>
+      <Form.Item
+        label="Độ ưu tiên"
+        name="priority"
+        rules={[{ required: true }]}
+      >
+        <Select>
+          <Option value="low">Low</Option>
+          <Option value="medium">Medium</Option>
+          <Option value="high">High</Option>
+        </Select>
+      </Form.Item>
 
-  <Form.Item className="flex justify-end">
-    <Button type="primary" htmlType="submit">
-      Lưu công việc
-    </Button>
-  </Form.Item>
-</Form>
+      <Form.Item className="flex justify-end">
+        <Button type="primary" htmlType="submit">
+          Lưu công việc
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 

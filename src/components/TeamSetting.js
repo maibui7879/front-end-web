@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import { Input, Button, Form, message, Upload, Modal } from 'antd';
-import { FaPlus, FaExclamationTriangle } from 'react-icons/fa';
-import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import React, { useState } from "react";
+import { Input, Button, Form, message, Upload, Modal } from "antd";
+import { FaPlus, FaExclamationTriangle } from "react-icons/fa";
+import { EditOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import axios from "axios";
 
 const TeamSetting = ({ team, onClose, onSave }) => {
   const [teamInfo, setTeamInfo] = useState({
     name: team.name,
     description: team.description,
-    avatar_url: team.avatar_url || '',
+    avatar_url: team.avatar_url || "",
   });
 
   const [editField, setEditField] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [forbiddenModal, setForbiddenModal] = useState(false);
-  
+
   const handleUpload = async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'ml_default');
+    formData.append("file", file);
+    formData.append("upload_preset", "ml_default");
 
     try {
       setUploading(true);
       const res = await axios.post(
-        'https://api.cloudinary.com/v1_1/dkshpgp3n/image/upload',
-        formData
+        "https://api.cloudinary.com/v1_1/dkshpgp3n/image/upload",
+        formData,
       );
       const url = res.data.secure_url;
 
@@ -36,18 +36,18 @@ const TeamSetting = ({ team, onClose, onSave }) => {
         { avatar_url: url },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
 
-      message.success('Tải ảnh lên thành công');
+      message.success("Tải ảnh lên thành công");
       onSave();
     } catch (error) {
       if (error.response?.status === 403) {
         setForbiddenModal(true);
       } else {
-        message.error('Lỗi khi tải ảnh');
+        message.error("Lỗi khi tải ảnh");
       }
     } finally {
       setUploading(false);
@@ -63,17 +63,17 @@ const TeamSetting = ({ team, onClose, onSave }) => {
         `http://localhost:5000/api/teams/${team.id}`,
         teamInfo,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        }
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        },
       );
-      message.success('Cập nhật thành công');
+      message.success("Cập nhật thành công");
       onSave(res.data);
       setEditField(null);
     } catch (error) {
       if (error.response?.status === 403) {
         setForbiddenModal(true);
       } else {
-        message.error('Không thể cập nhật');
+        message.error("Không thể cập nhật");
       }
     } finally {
       setLoading(false);
@@ -81,21 +81,21 @@ const TeamSetting = ({ team, onClose, onSave }) => {
   };
 
   const handleDeleteTeam = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     try {
-      const confirmDelete = window.confirm('Bạn chắc chắn muốn xóa nhóm này?');
+      const confirmDelete = window.confirm("Bạn chắc chắn muốn xóa nhóm này?");
       if (confirmDelete) {
         await axios.delete(`http://localhost:5000/api/teams/${team.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        message.success('Nhóm đã được xóa');
+        message.success("Nhóm đã được xóa");
         onClose();
       }
     } catch (error) {
       if (error.response?.status === 403) {
         setForbiddenModal(true);
       } else {
-        message.error('Không thể xóa nhóm');
+        message.error("Không thể xóa nhóm");
       }
     }
   };
@@ -139,7 +139,7 @@ const TeamSetting = ({ team, onClose, onSave }) => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <div className="font-medium">Tên nhóm:</div>
-                  {editField === 'name' ? (
+                  {editField === "name" ? (
                     <div className="flex-1 ml-4 flex items-center gap-2">
                       <Input
                         value={teamInfo.name}
@@ -147,8 +147,15 @@ const TeamSetting = ({ team, onClose, onSave }) => {
                           setTeamInfo({ ...teamInfo, name: e.target.value })
                         }
                       />
-                      <Button icon={<CheckOutlined />} onClick={handleSaveField} loading={loading} />
-                      <Button icon={<CloseOutlined />} onClick={() => setEditField(null)} />
+                      <Button
+                        icon={<CheckOutlined />}
+                        onClick={handleSaveField}
+                        loading={loading}
+                      />
+                      <Button
+                        icon={<CloseOutlined />}
+                        onClick={() => setEditField(null)}
+                      />
                     </div>
                   ) : (
                     <div className="flex-1 ml-4 flex items-center justify-between">
@@ -156,7 +163,7 @@ const TeamSetting = ({ team, onClose, onSave }) => {
                       <Button
                         icon={<EditOutlined />}
                         size="small"
-                        onClick={() => setEditField('name')}
+                        onClick={() => setEditField("name")}
                       />
                     </div>
                   )}
@@ -164,26 +171,36 @@ const TeamSetting = ({ team, onClose, onSave }) => {
 
                 <div className="flex justify-between items-start">
                   <div className="font-medium">Mô tả:</div>
-                  {editField === 'description' ? (
+                  {editField === "description" ? (
                     <div className="flex-1 ml-4 flex flex-col gap-2">
                       <Input.TextArea
                         value={teamInfo.description}
                         onChange={(e) =>
-                          setTeamInfo({ ...teamInfo, description: e.target.value })
+                          setTeamInfo({
+                            ...teamInfo,
+                            description: e.target.value,
+                          })
                         }
                       />
                       <div className="flex gap-2 mt-1">
-                        <Button icon={<CheckOutlined />} onClick={handleSaveField} loading={loading} />
-                        <Button icon={<CloseOutlined />} onClick={() => setEditField(null)} />
+                        <Button
+                          icon={<CheckOutlined />}
+                          onClick={handleSaveField}
+                          loading={loading}
+                        />
+                        <Button
+                          icon={<CloseOutlined />}
+                          onClick={() => setEditField(null)}
+                        />
                       </div>
                     </div>
                   ) : (
                     <div className="flex-1 ml-4 flex items-center justify-between">
-                      <span>{teamInfo.description || 'Chưa có mô tả'}</span>
+                      <span>{teamInfo.description || "Chưa có mô tả"}</span>
                       <Button
                         icon={<EditOutlined />}
                         size="small"
-                        onClick={() => setEditField('description')}
+                        onClick={() => setEditField("description")}
                       />
                     </div>
                   )}
@@ -216,7 +233,8 @@ const TeamSetting = ({ team, onClose, onSave }) => {
           <FaExclamationTriangle className="text-red-500 text-4xl mb-3" />
           <h2 className="text-lg font-semibold mb-1">Ra ngoài chơi!</h2>
           <p className="text-gray-600">
-            Chỉ có <span className="font-semibold">trưởng nhóm</span> mới có quyền thay đổi thông tin hoặc xóa nhóm!
+            Chỉ có <span className="font-semibold">trưởng nhóm</span> mới có
+            quyền thay đổi thông tin hoặc xóa nhóm!
           </p>
           <div className="mt-5">
             <Button type="primary" onClick={() => setForbiddenModal(false)}>

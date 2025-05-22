@@ -1,8 +1,8 @@
 // StepTwo.js
-import React from 'react';
-import { Upload } from 'antd';
-import { FaPlus } from 'react-icons/fa';
-import { EditOutlined } from '@ant-design/icons';
+import React from "react";
+import { Upload } from "antd";
+import { FaPlus } from "react-icons/fa";
+import { EditOutlined } from "@ant-design/icons";
 
 const StepTwo = ({ avatarUrl, setAvatarUrl, handleUpload, uploading }) => {
   return (

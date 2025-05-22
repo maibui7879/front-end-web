@@ -1,12 +1,12 @@
 // CreateTeamModal.js
-import React, { useState } from 'react';
-import { Modal, Button, message } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import StepOne from './StepOne';
-import StepTwo from './StepTwo';
-import StepThree from './StepThree';
-import StepProgress from './StepProgress';
-import axios from 'axios';
+import React, { useState } from "react";
+import { Modal, Button, message } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import StepOne from "./StepOne";
+import StepTwo from "./StepTwo";
+import StepThree from "./StepThree";
+import StepProgress from "./StepProgress";
+import axios from "axios";
 
 const CreateTeamModal = ({
   visible,
@@ -29,39 +29,39 @@ const CreateTeamModal = ({
 
   const handleCreateTeam = async (nextStep) => {
     if (!teamName.trim() || !teamDescription.trim()) {
-      message.warning('Vui lòng nhập đầy đủ thông tin nhóm');
+      message.warning("Vui lòng nhập đầy đủ thông tin nhóm");
       return;
     }
 
     try {
       const res = await axios.post(
-        'http://localhost:5000/api/teams',
+        "http://localhost:5000/api/teams",
         { name: teamName, description: teamDescription },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
 
       const createdTeamId = res.data.teamId;
-      message.success('Tạo nhóm thành công');
+      message.success("Tạo nhóm thành công");
       nextStep(createdTeamId);
     } catch (error) {
-      message.error('Lỗi khi tạo nhóm');
+      message.error("Lỗi khi tạo nhóm");
     }
   };
 
   const handleUpload = async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'ml_default');
+    formData.append("file", file);
+    formData.append("upload_preset", "ml_default");
 
     try {
       setUploading(true);
       const res = await axios.post(
-        'https://api.cloudinary.com/v1_1/dkshpgp3n/image/upload',
-        formData
+        "https://api.cloudinary.com/v1_1/dkshpgp3n/image/upload",
+        formData,
       );
 
       const url = res.data.secure_url;
@@ -72,14 +72,14 @@ const CreateTeamModal = ({
         { avatar_url: url },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
 
-      message.success('Tải ảnh lên thành công');
+      message.success("Tải ảnh lên thành công");
     } catch (error) {
-      message.error('Lỗi khi tải ảnh');
+      message.error("Lỗi khi tải ảnh");
     } finally {
       setUploading(false);
     }
@@ -101,12 +101,12 @@ const CreateTeamModal = ({
       try {
         await axios.delete(`http://localhost:5000/api/teams/${teamId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
-        message.info('Đã hủy và xóa nhóm');
+        message.info("Đã hủy và xóa nhóm");
       } catch (error) {
-        message.error('Lỗi khi xóa nhóm');
+        message.error("Lỗi khi xóa nhóm");
       }
     }
 
@@ -125,13 +125,13 @@ const CreateTeamModal = ({
       const res = await axios.get(
         `http://localhost:5000/api/user/search?searchTerm=${value}`,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        }
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        },
       );
       const users = res.data.users || [];
       setSearchUsers(users);
     } catch (error) {
-      message.error('Lỗi khi tìm kiếm người dùng');
+      message.error("Lỗi khi tìm kiếm người dùng");
     } finally {
       setSearchLoading(false);
     }
@@ -139,7 +139,7 @@ const CreateTeamModal = ({
 
   const handleInvite = async () => {
     if (!selectedUserId) {
-      message.warning('Vui lòng chọn người dùng');
+      message.warning("Vui lòng chọn người dùng");
       return;
     }
     try {
@@ -147,19 +147,21 @@ const CreateTeamModal = ({
         `http://localhost:5000/api/teams/member/${teamId}/invite/${selectedUserId}`,
         {},
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        }
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        },
       );
 
-      const invitedUser = searchUsers.find((user) => user.id === selectedUserId);
+      const invitedUser = searchUsers.find(
+        (user) => user.id === selectedUserId,
+      );
       if (invitedUser) {
         setInvitedUsers((prev) => [...prev, invitedUser]);
       }
 
-      message.success('Đã gửi lời mời');
+      message.success("Đã gửi lời mời");
       setSelectedUserId(null);
     } catch (error) {
-      message.error('Không thể gửi lời mời');
+      message.error("Không thể gửi lời mời");
     }
   };
 
@@ -175,10 +177,10 @@ const CreateTeamModal = ({
     <Modal
       title={
         step === 1
-          ? 'Tạo nhóm mới'
+          ? "Tạo nhóm mới"
           : step === 2
-          ? 'Thêm ảnh nhóm'
-          : 'Mời thành viên (tuỳ chọn)'
+            ? "Thêm ảnh nhóm"
+            : "Mời thành viên (tuỳ chọn)"
       }
       open={visible}
       onCancel={handleCancel}

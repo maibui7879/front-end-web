@@ -1,9 +1,19 @@
-import React, { useState, useContext } from 'react';
-import { Form, Input, Button, Checkbox, Typography, Card, Row, Col, message } from 'antd';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext'; // Đường dẫn đúng với dự án của bạn
+import React, { useState, useContext } from "react";
+import {
+  Form,
+  Input,
+  Button,
+  Checkbox,
+  Typography,
+  Card,
+  Row,
+  Col,
+  message,
+} from "antd";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext"; // Đường dẫn đúng với dự án của bạn
 
 const { Title, Text } = Typography;
 
@@ -16,19 +26,22 @@ const LoginForm = ({ onSwitch }) => {
   const handleLogin = async (values) => {
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', values);
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        values,
+      );
       login(res.data.token); // Cập nhật AuthContext và localStorage
-      message.success(res.data.message || 'Đăng nhập thành công!');
-      navigate('/home');
+      message.success(res.data.message || "Đăng nhập thành công!");
+      navigate("/home");
     } catch (err) {
       form.setFields([
         {
-          name: 'email',
-          errors: ['Sai tài khoản hoặc mật khẩu'],
+          name: "email",
+          errors: ["Sai tài khoản hoặc mật khẩu"],
         },
         {
-          name: 'password',
-          errors: [' '],
+          name: "password",
+          errors: [" "],
         },
       ]);
     } finally {
@@ -50,8 +63,8 @@ const LoginForm = ({ onSwitch }) => {
           label="Địa chỉ email"
           name="email"
           rules={[
-            { required: true, message: 'Vui lòng nhập email!' },
-            { type: 'email', message: 'Email không hợp lệ!' },
+            { required: true, message: "Vui lòng nhập email!" },
+            { type: "email", message: "Email không hợp lệ!" },
           ]}
         >
           <Input prefix={<UserOutlined />} placeholder="Nhập email" />
@@ -60,9 +73,12 @@ const LoginForm = ({ onSwitch }) => {
         <Form.Item
           label="Mật khẩu"
           name="password"
-          rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+          rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
         >
-          <Input.Password prefix={<LockOutlined />} placeholder="Nhập mật khẩu" />
+          <Input.Password
+            prefix={<LockOutlined />}
+            placeholder="Nhập mật khẩu"
+          />
         </Form.Item>
 
         <Form.Item>
@@ -80,7 +96,13 @@ const LoginForm = ({ onSwitch }) => {
         </Form.Item>
 
         <p className="text-center">
-          Chưa có tài khoản? <button className="text-blue-500 hover:text-blue-700" onClick={onSwitch}>Đăng ký</button>
+          Chưa có tài khoản?{" "}
+          <button
+            className="text-blue-500 hover:text-blue-700"
+            onClick={onSwitch}
+          >
+            Đăng ký
+          </button>
         </p>
       </Form>
     </Card>
@@ -96,35 +118,38 @@ const RegisterForm = ({ onSwitch }) => {
   const handleRegister = async (values) => {
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/auth/register', {
+      await axios.post("http://localhost:5000/api/auth/register", {
         email: values.email,
         password: values.password,
         full_name: values.full_name,
       });
 
-      const loginRes = await axios.post('http://localhost:5000/api/auth/login', {
-        email: values.email,
-        password: values.password,
-      });
+      const loginRes = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        {
+          email: values.email,
+          password: values.password,
+        },
+      );
 
       const token = loginRes.data.token;
       const userId = loginRes.data.userId;
 
       login(token); // Cập nhật AuthContext và localStorage
-      localStorage.setItem('userId', userId); // Optional: lưu userId riêng
+      localStorage.setItem("userId", userId); // Optional: lưu userId riêng
 
-      message.success('Đăng ký & đăng nhập thành công!');
+      message.success("Đăng ký & đăng nhập thành công!");
       navigate(`/create-profile?id=${userId}`);
     } catch (err) {
       if (err.response?.status === 409) {
         form.setFields([
           {
-            name: 'email',
-            errors: ['Email đã được sử dụng'],
+            name: "email",
+            errors: ["Email đã được sử dụng"],
           },
         ]);
       } else {
-        message.error(err.response?.data?.message || 'Lỗi đăng ký');
+        message.error(err.response?.data?.message || "Lỗi đăng ký");
       }
     } finally {
       setLoading(false);
@@ -144,7 +169,7 @@ const RegisterForm = ({ onSwitch }) => {
         <Form.Item
           label="Họ và tên"
           name="full_name"
-          rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
+          rules={[{ required: true, message: "Vui lòng nhập họ tên" }]}
         >
           <Input placeholder="Nhập họ và tên" />
         </Form.Item>
@@ -153,8 +178,8 @@ const RegisterForm = ({ onSwitch }) => {
           label="Địa chỉ email"
           name="email"
           rules={[
-            { required: true, message: 'Vui lòng nhập email!' },
-            { type: 'email', message: 'Email không hợp lệ!' },
+            { required: true, message: "Vui lòng nhập email!" },
+            { type: "email", message: "Email không hợp lệ!" },
           ]}
         >
           <Input prefix={<UserOutlined />} placeholder="Nhập email" />
@@ -163,9 +188,12 @@ const RegisterForm = ({ onSwitch }) => {
         <Form.Item
           label="Mật khẩu"
           name="password"
-          rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+          rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
         >
-          <Input.Password prefix={<LockOutlined />} placeholder="Nhập mật khẩu" />
+          <Input.Password
+            prefix={<LockOutlined />}
+            placeholder="Nhập mật khẩu"
+          />
         </Form.Item>
 
         <Form.Item>
@@ -175,7 +203,13 @@ const RegisterForm = ({ onSwitch }) => {
         </Form.Item>
 
         <p className="mx-auto text-center">
-          Đã có tài khoản? <button className="text-blue-500 hover:text-blue-700" onClick={onSwitch}>Đăng nhập</button>
+          Đã có tài khoản?{" "}
+          <button
+            className="text-blue-500 hover:text-blue-700"
+            onClick={onSwitch}
+          >
+            Đăng nhập
+          </button>
         </p>
       </Form>
     </Card>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Avatar, Typography, Card } from 'antd';
+import React from "react";
+import { Avatar, Typography, Card } from "antd";
 
 const { Text: AntdText } = Typography; // Renaming to avoid conflict
 

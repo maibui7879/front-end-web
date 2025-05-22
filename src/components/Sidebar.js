@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -10,25 +10,25 @@ const Sidebar = () => {
   const [showTeams, setShowTeams] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) return;
 
     const fetchProfile = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/user/profile', {
+        const response = await fetch("http://localhost:5000/api/user/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) throw new Error();
         const data = await response.json();
         setUser(data);
       } catch (err) {
-        console.error('Lỗi khi lấy thông tin người dùng:', err);
+        console.error("Lỗi khi lấy thông tin người dùng:", err);
       }
     };
 
     const fetchTeams = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/teams', {
+        const res = await fetch("http://localhost:5000/api/teams", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error();
@@ -53,20 +53,20 @@ const Sidebar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     sessionStorage.clear();
     setUser(null);
-    navigate('/');
+    navigate("/");
     window.location.reload();
   };
 
   const toggleTeams = (e) => {
     e.stopPropagation();
-    setShowTeams(prev => !prev);
+    setShowTeams((prev) => !prev);
   };
 
   const goToTeamsPage = () => {
-    navigate('/team');
+    navigate("/team");
   };
 
   return (
@@ -74,23 +74,29 @@ const Sidebar = () => {
       {user && (
         <div className="flex flex-col items-center md:flex-row md:items-center gap-2 px-4 py-4">
           <img
-            src={user.avatar_url || 'https://i.pravatar.cc/100'}
+            src={user.avatar_url || "https://i.pravatar.cc/100"}
             alt="Avatar"
             className="h-8 w-8 rounded-full object-cover border-2 border-white shadow"
           />
-          <span className="hidden md:inline text-sm font-semibold">{user.full_name}</span>
+          <span className="hidden md:inline text-sm font-semibold">
+            {user.full_name}
+          </span>
         </div>
       )}
 
       <div className="border-t border-gray-300 mx-4" />
 
       <ul className="mt-4 space-y-1 px-3">
-        <p className="px-4 py-2 text-gray-500 text-xs uppercase tracking-wide">Chung</p>
+        <p className="px-4 py-2 text-gray-500 text-xs uppercase tracking-wide">
+          Chung
+        </p>
         <SidebarItem icon="fa-home" label="Trang Chủ" to="/home" />
       </ul>
 
       <ul className="mt-4 space-y-1 px-3">
-        <p className="px-4 py-2 text-gray-500 text-xs uppercase tracking-wide">Đội nhóm</p>
+        <p className="px-4 py-2 text-gray-500 text-xs uppercase tracking-wide">
+          Đội nhóm
+        </p>
         <li>
           <div
             onClick={goToTeamsPage}
@@ -103,7 +109,7 @@ const Sidebar = () => {
               className="ml-auto text-gray-600 hover:text-blue-700"
             >
               <i
-                className={`fa text-xs ${showTeams ? 'fa-chevron-up' : 'fa-chevron-down'}`}
+                className={`fa text-xs ${showTeams ? "fa-chevron-up" : "fa-chevron-down"}`}
               />
             </button>
           </div>
@@ -120,15 +126,19 @@ const Sidebar = () => {
             {!teamLoading && !teamError && teams.length === 0 && (
               <li className="text-gray-500 ml-4 text-xs">Chưa có nhóm nào</li>
             )}
-            {!teamLoading && !teamError && teams.length > 0 &&
-              teams.slice(0, 5).map(team => (
+            {!teamLoading &&
+              !teamError &&
+              teams.length > 0 &&
+              teams.slice(0, 5).map((team) => (
                 <li
                   key={team.id}
                   className="ml-6 md:ml-8 flex items-center cursor-pointer hover:text-blue-700 transition text-sm"
                   onClick={() => navigate(`/teams/${team.id}`)}
                 >
                   <img
-                    src={team.avatar_url || 'https://i.pravatar.cc/40?u=' + team.id}
+                    src={
+                      team.avatar_url || "https://i.pravatar.cc/40?u=" + team.id
+                    }
                     alt={`${team.name} avatar`}
                     className="h-5 w-5 rounded-full object-cover mr-2 border border-gray-300"
                   />
@@ -140,9 +150,15 @@ const Sidebar = () => {
       </ul>
 
       <ul className="mt-4 space-y-1 px-3">
-        <p className="px-4 py-2 text-gray-500 text-xs uppercase tracking-wide">Tài khoản</p>
+        <p className="px-4 py-2 text-gray-500 text-xs uppercase tracking-wide">
+          Tài khoản
+        </p>
         <SidebarItem icon="fa-user" label="Hồ Sơ" to="/profile" />
-        <SidebarItem icon="fa-briefcase" label="Công việc cá nhân" to="/personal-tasks" />
+        <SidebarItem
+          icon="fa-briefcase"
+          label="Công việc cá nhân"
+          to="/personal-tasks"
+        />
       </ul>
 
       <div className="border-t border-gray-300 my-6 mx-4" />

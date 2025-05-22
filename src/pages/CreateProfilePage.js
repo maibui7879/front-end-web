@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from "react";
 import {
   Form,
   Input,
@@ -12,19 +12,19 @@ import {
   Card,
   Row,
   Col,
-} from 'antd';
-import { EditOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import dayjs from 'dayjs';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext'; // 👈 thêm dòng này
+} from "antd";
+import { EditOutlined } from "@ant-design/icons";
+import axios from "axios";
+import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext"; // 👈 thêm dòng này
 
 const { Title, Text } = Typography;
 
 const CreateProfilePage = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [initialLoading, setInitialLoading] = useState(true);
   const navigate = useNavigate();
   const { token } = useContext(AuthContext); // 👈 lấy token từ context
@@ -34,17 +34,19 @@ const CreateProfilePage = () => {
       if (!token) return; // 👈 kiểm tra token trước khi fetch
 
       try {
-        const res = await axios.get('http://localhost:5000/api/user/profile', {
+        const res = await axios.get("http://localhost:5000/api/user/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const profile = res.data;
         form.setFieldsValue({
           ...profile,
-          date_of_birth: profile.date_of_birth ? dayjs(profile.date_of_birth) : null,
+          date_of_birth: profile.date_of_birth
+            ? dayjs(profile.date_of_birth)
+            : null,
         });
-        setAvatarUrl(profile.avatar_url || '');
+        setAvatarUrl(profile.avatar_url || "");
       } catch {
-        message.warning('Chưa có thông tin hồ sơ, vui lòng điền mới.');
+        message.warning("Chưa có thông tin hồ sơ, vui lòng điền mới.");
       } finally {
         setInitialLoading(false);
       }
@@ -54,19 +56,19 @@ const CreateProfilePage = () => {
 
   const handleUpload = async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'ml_default');
+    formData.append("file", file);
+    formData.append("upload_preset", "ml_default");
 
     try {
       const res = await axios.post(
-        'https://api.cloudinary.com/v1_1/dkshpgp3n/image/upload',
-        formData
+        "https://api.cloudinary.com/v1_1/dkshpgp3n/image/upload",
+        formData,
       );
       setAvatarUrl(res.data.secure_url);
-      message.success('Tải ảnh lên thành công!');
+      message.success("Tải ảnh lên thành công!");
     } catch (err) {
-      console.error('Upload error:', err.response?.data || err.message);
-      message.error('Lỗi tải ảnh lên Cloudinary!');
+      console.error("Upload error:", err.response?.data || err.message);
+      message.error("Lỗi tải ảnh lên Cloudinary!");
     }
 
     return false;
@@ -76,7 +78,7 @@ const CreateProfilePage = () => {
     setLoading(true);
 
     if (!avatarUrl) {
-      message.warning('Vui lòng tải lên ảnh đại diện.');
+      message.warning("Vui lòng tải lên ảnh đại diện.");
       setLoading(false);
       return;
     }
@@ -84,19 +86,19 @@ const CreateProfilePage = () => {
     try {
       const data = {
         ...values,
-        date_of_birth: values.date_of_birth?.format('YYYY-MM-DD'),
+        date_of_birth: values.date_of_birth?.format("YYYY-MM-DD"),
         avatar_url: avatarUrl,
       };
 
-      await axios.put('http://localhost:5000/api/user/profile', data, {
+      await axios.put("http://localhost:5000/api/user/profile", data, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      message.success('Cập nhật hồ sơ thành công!');
-      setTimeout(() => navigate('/home'), 1500);
+      message.success("Cập nhật hồ sơ thành công!");
+      setTimeout(() => navigate("/home"), 1500);
     } catch (err) {
       console.error(err);
-      message.error('Lỗi cập nhật hồ sơ!');
+      message.error("Lỗi cập nhật hồ sơ!");
     } finally {
       setLoading(false);
     }
@@ -121,7 +123,7 @@ const CreateProfilePage = () => {
               <div className="relative w-28 h-28 mx-auto mb-4">
                 <img
                   className="w-full h-full rounded-full border-4 border-white shadow-lg object-cover"
-                  src={avatarUrl || 'https://i.pravatar.cc/100'}
+                  src={avatarUrl || "https://i.pravatar.cc/100"}
                   alt="Avatar"
                 />
                 <Upload
@@ -138,10 +140,10 @@ const CreateProfilePage = () => {
             )}
 
             <Title level={5}>
-              {form.getFieldValue('full_name') || 'Tên người dùng'}
+              {form.getFieldValue("full_name") || "Tên người dùng"}
             </Title>
             <Text type="secondary">
-              {form.getFieldValue('email') || 'Email'}
+              {form.getFieldValue("email") || "Email"}
             </Text>
           </Col>
 
@@ -162,7 +164,7 @@ const CreateProfilePage = () => {
               <Form.Item
                 name="email"
                 label={<Text strong>Email</Text>}
-                rules={[{ required: true, type: 'email' }]}
+                rules={[{ required: true, type: "email" }]}
               >
                 <Input />
               </Form.Item>
@@ -173,10 +175,7 @@ const CreateProfilePage = () => {
               >
                 <Input />
               </Form.Item>
-              <Form.Item
-                name="gender"
-                label={<Text strong>Giới tính</Text>}
-              >
+              <Form.Item name="gender" label={<Text strong>Giới tính</Text>}>
                 <Radio.Group>
                   <Radio value="male">Nam</Radio>
                   <Radio value="female">Nữ</Radio>
@@ -190,10 +189,7 @@ const CreateProfilePage = () => {
               >
                 <DatePicker format="YYYY-MM-DD" className="w-full" />
               </Form.Item>
-              <Form.Item
-                name="address"
-                label={<Text strong>Địa chỉ</Text>}
-              >
+              <Form.Item name="address" label={<Text strong>Địa chỉ</Text>}>
                 <Input />
               </Form.Item>
 

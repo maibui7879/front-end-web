@@ -1,5 +1,5 @@
-import React from 'react';
-import { Select, Button, List, Avatar } from 'antd';
+import React from "react";
+import { Select, Button, List, Avatar } from "antd";
 
 const { Option } = Select;
 
@@ -19,7 +19,7 @@ const StepThree = ({
         placeholder="Tìm kiếm người dùng..."
         onSearch={handleSearchUsers}
         onChange={(value) => setSelectedUserId(value)}
-        style={{ width: '100%' }}
+        style={{ width: "100%" }}
         loading={searchLoading}
         filterOption={false}
         value={selectedUserId}

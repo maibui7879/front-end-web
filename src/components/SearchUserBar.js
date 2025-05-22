@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react';
-import { Select, Spin } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
+import React, { useState, useContext } from "react";
+import { Select, Spin } from "antd";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
 
 const { Option } = Select;
 
@@ -19,16 +19,19 @@ const SearchUserBar = () => {
 
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/user/search?searchTerm=${encodeURIComponent(value)}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `http://localhost:5000/api/user/search?searchTerm=${encodeURIComponent(value)}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
-      if (!res.ok) throw new Error('Search failed');
+      if (!res.ok) throw new Error("Search failed");
 
       const data = await res.json();
       setSearchUsers(data.users || []);
     } catch (err) {
-      console.error('Lỗi tìm kiếm:', err);
+      console.error("Lỗi tìm kiếm:", err);
     } finally {
       setLoading(false);
     }
@@ -45,7 +48,7 @@ const SearchUserBar = () => {
       onSearch={handleSearch}
       onSelect={handleSelect}
       filterOption={false}
-      notFoundContent={loading ? <Spin size="small" /> : 'Không tìm thấy'}
+      notFoundContent={loading ? <Spin size="small" /> : "Không tìm thấy"}
       className="w-64 md:w-80"
       allowClear
     >

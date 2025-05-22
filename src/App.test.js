@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import TeamList from './components/TeamList';
-import TeamDetail from './components/TeamDetail';
-import TeamForm from './components/TeamForm';
+import React, { useState } from "react";
+import TeamList from "./components/TeamList";
+import TeamDetail from "./components/TeamDetail";
+import TeamForm from "./components/TeamForm";
 
 const App = () => {
   const [selectedTeamId, setSelectedTeamId] = useState(null);
@@ -13,9 +13,15 @@ const App = () => {
         // Truyền setIsCreatingNewTeam vào TeamForm
         <TeamForm setIsCreatingNewTeam={setIsCreatingNewTeam} />
       ) : selectedTeamId ? (
-        <TeamDetail selectedTeamId={selectedTeamId} setSelectedTeamId={setSelectedTeamId} />
+        <TeamDetail
+          selectedTeamId={selectedTeamId}
+          setSelectedTeamId={setSelectedTeamId}
+        />
       ) : (
-        <TeamList setSelectedTeamId={setSelectedTeamId} setIsCreatingNewTeam={setIsCreatingNewTeam} />
+        <TeamList
+          setSelectedTeamId={setSelectedTeamId}
+          setIsCreatingNewTeam={setIsCreatingNewTeam}
+        />
       )}
     </div>
   );

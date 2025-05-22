@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
-import SearchUserBar from './SearchUserBar';
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
+import SearchUserBar from "./SearchUserBar";
 
 const Topbar = () => {
   const [user, setUser] = useState(null);
@@ -15,18 +15,18 @@ const Topbar = () => {
       if (!token) return;
 
       try {
-        const res = await fetch('http://localhost:5000/api/user/profile', {
+        const res = await fetch("http://localhost:5000/api/user/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        if (!res.ok) throw new Error('Không thể tải hồ sơ');
+        if (!res.ok) throw new Error("Không thể tải hồ sơ");
 
         const data = await res.json();
         setUser(data);
       } catch (error) {
-        console.error('Lỗi khi tải thông tin topbar:', error);
+        console.error("Lỗi khi tải thông tin topbar:", error);
       }
     };
 
@@ -39,19 +39,19 @@ const Topbar = () => {
         setMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleNavigateProfile = () => {
     setMenuOpen(false);
-    navigate('/profile');
+    navigate("/profile");
   };
 
   const handleLogout = () => {
     logout();
     setMenuOpen(false);
-    navigate('/auth');
+    navigate("/auth");
   };
 
   return (
@@ -70,7 +70,7 @@ const Topbar = () => {
           >
             <span className="hidden md:inline">{user.full_name}</span>
             <img
-              src={user.avatar_url || 'https://i.pravatar.cc/100'}
+              src={user.avatar_url || "https://i.pravatar.cc/100"}
               alt="Avatar"
               className="h-10 w-10 rounded-full object-cover border-2 border-white shadow"
             />

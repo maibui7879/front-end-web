@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Modal, Select, Button, List, Avatar, message } from 'antd';
-import axios from 'axios';
+import React, { useState } from "react";
+import { Modal, Select, Button, List, Avatar, message } from "antd";
+import axios from "axios";
 
 const { Option } = Select;
 
@@ -17,13 +17,13 @@ const InviteMemberModal = ({ visible, onCancel, onInvite, teamId }) => {
       const res = await axios.get(
         `http://localhost:5000/api/user/search?searchTerm=${value}`,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        }
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        },
       );
       const users = res.data.users || [];
       setSearchUsers(users);
     } catch (error) {
-      message.error('Lỗi khi tìm kiếm người dùng');
+      message.error("Lỗi khi tìm kiếm người dùng");
     } finally {
       setSearchLoading(false);
     }
@@ -45,16 +45,18 @@ const InviteMemberModal = ({ visible, onCancel, onInvite, teamId }) => {
           `http://localhost:5000/api/teams/member/${teamId}/invite/${user.id}`,
           {},
           {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-          }
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
         );
       }
-      message.success('Đã gửi lời mời cho các thành viên');
+      message.success("Đã gửi lời mời cho các thành viên");
       onInvite();
       onCancel();
       setInvitedUsers([]);
     } catch (error) {
-      message.error('Không thể gửi lời mời');
+      message.error("Không thể gửi lời mời");
     }
   };
 
@@ -71,7 +73,7 @@ const InviteMemberModal = ({ visible, onCancel, onInvite, teamId }) => {
           placeholder="Tìm kiếm người dùng..."
           onSearch={handleSearchUsers}
           onChange={(value) => setSelectedUserId(value)}
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           loading={searchLoading}
           filterOption={false}
           value={selectedUserId}
@@ -84,7 +86,12 @@ const InviteMemberModal = ({ visible, onCancel, onInvite, teamId }) => {
           ))}
         </Select>
 
-        <Button type="dashed" block onClick={handleAddUser} disabled={!selectedUserId}>
+        <Button
+          type="dashed"
+          block
+          onClick={handleAddUser}
+          disabled={!selectedUserId}
+        >
           Thêm vào danh sách mời
         </Button>
 

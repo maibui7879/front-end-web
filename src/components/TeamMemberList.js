@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Typography, Button, message } from 'antd';
-import TeamMemberCard from './TeamMemberCard';
-import { AuthContext } from '../contexts/AuthContext';
-import axios from 'axios';
+import React, { useEffect, useState, useContext } from "react";
+import { Typography, Button, message } from "antd";
+import TeamMemberCard from "./TeamMemberCard";
+import { AuthContext } from "../contexts/AuthContext";
+import axios from "axios";
 
 const { Title } = Typography;
 
@@ -12,12 +12,15 @@ const TeamMemberList = ({ onInviteClick, teamId }) => {
 
   const fetchMembers = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/teams/${teamId}/members`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        `http://localhost:5000/api/teams/${teamId}/members`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       setMembers(res.data);
     } catch (err) {
-      message.error('Không thể tải danh sách thành viên');
+      message.error("Không thể tải danh sách thành viên");
     }
   };
 
@@ -42,8 +45,8 @@ const TeamMemberList = ({ onInviteClick, teamId }) => {
             key={member.id}
             member={member}
             teamId={teamId}
-            canManage={['creator', 'admin'].includes(currentUser?.role)}
-            onChange={fetchMembers} 
+            canManage={["creator", "admin"].includes(currentUser?.role)}
+            onChange={fetchMembers}
           />
         ))}
       </div>

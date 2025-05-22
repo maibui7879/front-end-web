@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Row, Col, Button, Typography } from 'antd';
-import { LoginForm, RegisterForm } from '../components/Forms';
+import React, { useState } from "react";
+import { Row, Col, Button, Typography } from "antd";
+import { LoginForm, RegisterForm } from "../components/Forms";
 
 const { Title } = Typography;
 
@@ -16,11 +16,14 @@ const AuthPage = () => {
       className="min-h-screen flex items-center justify-center px-4 py-10"
       style={{
         backgroundImage: "url('/bg.png')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
-      <Row gutter={32} className="w-full max-w-6xl bg-white bg-opacity-50 rounded-xl p-6">
+      <Row
+        gutter={32}
+        className="w-full max-w-6xl bg-white bg-opacity-50 rounded-xl p-6"
+      >
         <Col
           xs={24}
           md={12}
@@ -34,12 +37,12 @@ const AuthPage = () => {
             size="large"
             className="mt-4 font-bold shadow-lg"
             style={{
-              background: 'linear-gradient(to bottom, #5cb4ff, #2c85d5)',
-              border: 'none',
+              background: "linear-gradient(to bottom, #5cb4ff, #2c85d5)",
+              border: "none",
             }}
             onClick={toggleForm}
           >
-            ➤ {isRegistering ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ TÀI KHOẢN'}
+            ➤ {isRegistering ? "ĐĂNG NHẬP" : "ĐĂNG KÝ TÀI KHOẢN"}
           </Button>
         </Col>
 

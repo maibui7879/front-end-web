@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Button, Typography, message, Table, Avatar } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import CreateTeamModal from '../components/CreateTeamModal';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Button, Typography, message, Table, Avatar } from "antd";
+import { useNavigate } from "react-router-dom";
+import CreateTeamModal from "../components/CreateTeamModal";
 
 const { Title } = Typography;
 
@@ -10,8 +10,8 @@ const TeamPage = () => {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newTeamName, setNewTeamName] = useState('');
-  const [newTeamDescription, setNewTeamDescription] = useState('');
+  const [newTeamName, setNewTeamName] = useState("");
+  const [newTeamDescription, setNewTeamDescription] = useState("");
   const [newTeamId, setNewTeamId] = useState(null);
   const navigate = useNavigate();
 
@@ -21,14 +21,14 @@ const TeamPage = () => {
 
   const fetchTeams = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/teams', {
+      const res = await axios.get("http://localhost:5000/api/teams", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       setTeams(res.data.items);
     } catch {
-      message.error('Không thể tải danh sách nhóm');
+      message.error("Không thể tải danh sách nhóm");
     } finally {
       setLoading(false);
     }
@@ -36,55 +36,55 @@ const TeamPage = () => {
 
   const handleCreateTeam = async (nextStep) => {
     if (!newTeamName.trim() || !newTeamDescription.trim()) {
-      message.warning('Vui lòng nhập đầy đủ thông tin nhóm');
+      message.warning("Vui lòng nhập đầy đủ thông tin nhóm");
       return;
     }
 
     try {
       const res = await axios.post(
-        'http://localhost:5000/api/teams',
+        "http://localhost:5000/api/teams",
         { name: newTeamName, description: newTeamDescription },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
       setNewTeamId(res.data.id);
-      message.success('Tạo nhóm thành công');
+      message.success("Tạo nhóm thành công");
       fetchTeams();
       nextStep();
     } catch {
-      message.error('Lỗi khi tạo nhóm');
+      message.error("Lỗi khi tạo nhóm");
     }
   };
 
   const handleAvatarUploaded = () => {
     setShowCreateModal(false);
-    setNewTeamName('');
-    setNewTeamDescription('');
+    setNewTeamName("");
+    setNewTeamDescription("");
     setNewTeamId(null);
     fetchTeams();
   };
 
   const columns = [
     {
-      title: 'Avatar',
-      dataIndex: 'avatar_url',
-      key: 'avatar',
+      title: "Avatar",
+      dataIndex: "avatar_url",
+      key: "avatar",
       render: (url, record) => (
         <Avatar src={url || `https://i.pravatar.cc/40?u=${record.id}`} />
       ),
     },
     {
-      title: 'Tên nhóm',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Tên nhóm",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
     },
   ];
 
@@ -117,7 +117,7 @@ const TeamPage = () => {
         pagination={{ pageSize: 5 }}
         onRow={(record) => ({
           onClick: () => navigate(`/teams/${record.id}`),
-          style: { cursor: 'pointer' },
+          style: { cursor: "pointer" },
         })}
       />
     </div>

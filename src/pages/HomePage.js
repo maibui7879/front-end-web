@@ -1,14 +1,14 @@
 // src/components/HomePage.tsx
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     if (!token) {
-      navigate('/auth', { replace: true });
+      navigate("/auth", { replace: true });
     }
   }, [token, navigate]);
 
