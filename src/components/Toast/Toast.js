@@ -55,6 +55,7 @@ const Toast = ({ title, message, type = 'info', duration = 3000 }) => {
             </div>
             <button onClick={handleClose} className="ml-4 text-gray-400 hover:text-gray-600 text-lg">
                 <FontAwesomeIcon icon={faTimesCircle} />
+                "xin chào"
             </button>
         </div>
     );
