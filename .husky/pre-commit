@@ -4,7 +4,7 @@
 echo "Format lại code trước khi commit"
 
 npm run lint --silent > nul 2>&1
-echo "✅ Lint done."
+echo "✅ Lint done"
 
 npm run format --silent > nul 2>&1
-echo "✅ Format done."
+echo "✅ Format done"
