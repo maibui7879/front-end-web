@@ -3,8 +3,8 @@
 
 echo "🛠️ Running pre-commit hook..."
 
-npm run lint
+npm run lint --silent > nul 2>&1
 echo "✅ Lint done."
 
-npm run format
+npm run format --silent > nul 2>&1
 echo "✅ Format done."
