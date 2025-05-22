@@ -1,4 +1,3 @@
-import React from 'react';
 import Toast from './Toast';
 
 const ToastContainer = ({ toasts = [] }) => {
@@ -18,3 +17,10 @@ const ToastContainer = ({ toasts = [] }) => {
 };
 
 export default ToastContainer;
+//=================Cách dùng==================
+// import ToastContainer from '~/components/Toast';
+// const [toasts, setToasts] = useState([]);
+//  const addToast = ({ title, message, type, duration }) => {
+//         setToasts((prevToasts) => [...prevToasts, { title, message, type, duration }]);
+//     };
+//       <ToastContainer toasts={toasts} />
