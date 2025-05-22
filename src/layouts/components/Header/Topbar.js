@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
-import SearchUserBar from './SearchUserBar';
+import { AuthContext } from '../../../contexts/AuthContext';
+import SearchUserBar from '../../../components/SearchUserBar';
 
 const Topbar = () => {
     const [user, setUser] = useState(null);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import Topbar from './components/Topbar';
+import Sidebar from './layouts/Sidebar/Sidebar';
+import Topbar from './layouts/components/Header/Topbar';
 import HomePage from './pages/Home/HomePage';
 import TeamPage from './pages/Teams/TeamPage';
 import Profile from './pages/UserCRUD/Profile';
