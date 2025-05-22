@@ -4,7 +4,7 @@ import { EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext'; // 👈 thêm dòng này
+import { AuthContext } from '../../contexts/AuthContext'; // 👈 thêm dòng này
 
 const { Title, Text } = Typography;
 

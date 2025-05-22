@@ -2,15 +2,15 @@ import React, { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
-import HomePage from './pages/HomePage';
-import TeamPage from './pages/TeamPage';
-import Profile from './pages/Profile';
-import PersonalTasksPage from './pages/PersonalTasksPage';
-import AuthPage from './pages/AuthPage';
-import CreateProfilePage from './pages/CreateProfilePage';
+import HomePage from './pages/Home/HomePage';
+import TeamPage from './pages/Teams/TeamPage';
+import Profile from './pages/UserCRUD/Profile';
+import PersonalTasksPage from './pages/Tasks/PersonalTasksPage';
+import AuthPage from './pages/AuthPage/AuthPage';
+import CreateProfilePage from './pages/UserCRUD/CreateProfilePage';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
-import TeamDetailPage from './pages/TeamDetailPage';
-import ProfileId from './pages/ProfileId';
+import TeamDetailPage from './pages/Teams/TeamDetailPage';
+import ProfileId from './pages/UserCRUD/ProfileId';
 const AppLayout = ({ children, sidebarOpen, toggleSidebar }) => (
     <div
         className="min-h-screen flex"

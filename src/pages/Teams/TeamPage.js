@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Button, Typography, message, Table, Avatar } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import CreateTeamModal from '../components/CreateTeamModal';
+import CreateTeamModal from '../../components/CreateTeamModal';
 
 const { Title } = Typography;
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname "$0")/_/husky.sh"
 
-echo "🛠️ Running pre-commit hook..."
+echo "Format lại code trước khi commit"
 
 npm run lint --silent > nul 2>&1
 echo "✅ Lint done."

@@ -3,11 +3,11 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { Typography, Spin, message, Button, Divider } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
-import TeamCreator from '../components/TeamCreator';
-import TeamMemberList from '../components/TeamMemberList';
-import InviteMemberModal from '../components/InviteMemberModal';
-import TeamSetting from '../components/TeamSetting';
-import TeamTaskList from '../components/TeamTaskList';
+import TeamCreator from '../../components/TeamCreator';
+import TeamMemberList from '../../components/TeamMemberList';
+import InviteMemberModal from '../../components/InviteMemberModal';
+import TeamSetting from '../../components/TeamSetting';
+import TeamTaskList from '../../components/TeamTaskList';
 
 const { Title, Text } = Typography;
 

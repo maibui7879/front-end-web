@@ -1,30 +1,32 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams } from 'react-router-dom';
-import { Avatar, Card, Row, Col, Typography, Skeleton, Descriptions, message } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
-import { AuthContext } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Avatar, Button, Card, Row, Col, Typography, Skeleton, Descriptions, message } from 'antd';
+import { EditOutlined, UserOutlined } from '@ant-design/icons';
+import { AuthContext } from '../../contexts/AuthContext'; // 👈 Thêm dòng này
 
 const { Title, Text } = Typography;
 
-const ProfileId = () => {
-    const { id } = useParams();
-    const { token } = useContext(AuthContext);
+const Profile = () => {
+    const navigate = useNavigate();
+    const { token } = useContext(AuthContext); // 👈 Lấy token từ context
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchProfile = async () => {
-            if (!token || !id) return;
+            if (!token) return; // 👈 Nếu chưa có token thì không gọi
 
             try {
-                const res = await fetch(`http://localhost:5000/api/user/profile/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
+                const res = await fetch('http://localhost:5000/api/user/profile', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
 
                 if (!res.ok) throw new Error('Failed to fetch profile');
 
                 const data = await res.json();
-                setUser(data.profile);
+                setUser(data);
             } catch (error) {
                 console.error('Lỗi khi lấy hồ sơ:', error);
                 message.error('Không thể tải hồ sơ người dùng.');
@@ -34,7 +36,11 @@ const ProfileId = () => {
         };
 
         fetchProfile();
-    }, [token, id]);
+    }, [token]); // 👈 gọi lại nếu token thay đổi
+
+    const handleEdit = () => {
+        navigate('/create-profile');
+    };
 
     if (loading) {
         return (
@@ -52,7 +58,7 @@ const ProfileId = () => {
         <div className="p-6 min-h-screen">
             <Card bordered={false} className="max-w-5xl mx-auto rounded-2xl !shadow-lg" bodyStyle={{ padding: 24 }}>
                 <Title level={3} className="text-center mb-8">
-                    👤 Hồ sơ người dùng
+                    👤 Hồ sơ cá nhân
                 </Title>
 
                 <Row gutter={[32, 32]} className="items-center">
@@ -63,8 +69,18 @@ const ProfileId = () => {
                             icon={!user.avatar_url && <UserOutlined />}
                             className="mb-4 shadow-lg"
                         />
-                        <Title level={5}>{user.full_name || 'Không tên'}</Title>
-                        <Text type="secondary">{user.email || 'Chưa cập nhật email'}</Text>
+                        <Title level={5}>{user.full_name}</Title>
+                        <Text type="secondary">{user.email}</Text>
+                        <div className="mt-4">
+                            <Button
+                                type="primary"
+                                icon={<EditOutlined />}
+                                onClick={handleEdit}
+                                className="rounded-full px-6 bg-blue-500 hover:bg-blue-600"
+                            >
+                                Chỉnh sửa hồ sơ
+                            </Button>
+                        </div>
                     </Col>
 
                     <Col xs={24} md={18}>
@@ -95,4 +111,4 @@ const ProfileId = () => {
     );
 };
 
-export default ProfileId;
+export default Profile;

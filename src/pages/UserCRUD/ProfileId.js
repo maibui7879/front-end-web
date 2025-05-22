@@ -1,32 +1,30 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Avatar, Button, Card, Row, Col, Typography, Skeleton, Descriptions, message } from 'antd';
-import { EditOutlined, UserOutlined } from '@ant-design/icons';
-import { AuthContext } from '../contexts/AuthContext'; // 👈 Thêm dòng này
+import { useParams } from 'react-router-dom';
+import { Avatar, Card, Row, Col, Typography, Skeleton, Descriptions, message } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+import { AuthContext } from '../../contexts/AuthContext';
 
 const { Title, Text } = Typography;
 
-const Profile = () => {
-    const navigate = useNavigate();
-    const { token } = useContext(AuthContext); // 👈 Lấy token từ context
+const ProfileId = () => {
+    const { id } = useParams();
+    const { token } = useContext(AuthContext);
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchProfile = async () => {
-            if (!token) return; // 👈 Nếu chưa có token thì không gọi
+            if (!token || !id) return;
 
             try {
-                const res = await fetch('http://localhost:5000/api/user/profile', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                const res = await fetch(`http://localhost:5000/api/user/profile/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` },
                 });
 
                 if (!res.ok) throw new Error('Failed to fetch profile');
 
                 const data = await res.json();
-                setUser(data);
+                setUser(data.profile);
             } catch (error) {
                 console.error('Lỗi khi lấy hồ sơ:', error);
                 message.error('Không thể tải hồ sơ người dùng.');
@@ -36,11 +34,7 @@ const Profile = () => {
         };
 
         fetchProfile();
-    }, [token]); // 👈 gọi lại nếu token thay đổi
-
-    const handleEdit = () => {
-        navigate('/create-profile');
-    };
+    }, [token, id]);
 
     if (loading) {
         return (
@@ -58,7 +52,7 @@ const Profile = () => {
         <div className="p-6 min-h-screen">
             <Card bordered={false} className="max-w-5xl mx-auto rounded-2xl !shadow-lg" bodyStyle={{ padding: 24 }}>
                 <Title level={3} className="text-center mb-8">
-                    👤 Hồ sơ cá nhân
+                    👤 Hồ sơ người dùng
                 </Title>
 
                 <Row gutter={[32, 32]} className="items-center">
@@ -69,18 +63,8 @@ const Profile = () => {
                             icon={!user.avatar_url && <UserOutlined />}
                             className="mb-4 shadow-lg"
                         />
-                        <Title level={5}>{user.full_name}</Title>
-                        <Text type="secondary">{user.email}</Text>
-                        <div className="mt-4">
-                            <Button
-                                type="primary"
-                                icon={<EditOutlined />}
-                                onClick={handleEdit}
-                                className="rounded-full px-6 bg-blue-500 hover:bg-blue-600"
-                            >
-                                Chỉnh sửa hồ sơ
-                            </Button>
-                        </div>
+                        <Title level={5}>{user.full_name || 'Không tên'}</Title>
+                        <Text type="secondary">{user.email || 'Chưa cập nhật email'}</Text>
                     </Col>
 
                     <Col xs={24} md={18}>
@@ -111,4 +95,4 @@ const Profile = () => {
     );
 };
 
-export default Profile;
+export default ProfileId;
