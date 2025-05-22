@@ -1,9 +1,10 @@
 import React, { useState, useContext } from 'react';
-import { Form, Input, Button, Checkbox, Typography, Card, Row, Col, message } from 'antd';
+import { Form, Input, Button, Checkbox, Typography, Card, Row, Col } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext'; // Đường dẫn đúng với dự án của bạn
+import { AuthContext } from '../contexts/AuthContext';
+import toast from './Toast'; 
 
 const { Title, Text } = Typography;
 
@@ -17,20 +18,18 @@ const LoginForm = ({ onSwitch }) => {
     setLoading(true);
     try {
       const res = await axios.post('http://localhost:5000/api/auth/login', values);
-      login(res.data.token); // Cập nhật AuthContext và localStorage
-      message.success(res.data.message || 'Đăng nhập thành công!');
-      navigate('/home');
+      login(res.data.token);
+      toast.success(res.data.message || 'Đăng nhập thành công!');
+      console.log("Toast success called");
+      setTimeout(() => {
+        navigate('/home');
+      }, 3000);
     } catch (err) {
       form.setFields([
-        {
-          name: 'email',
-          errors: ['Sai tài khoản hoặc mật khẩu'],
-        },
-        {
-          name: 'password',
-          errors: [' '],
-        },
+        { name: 'email', errors: ['Sai tài khoản hoặc mật khẩu'] },
+        { name: 'password', errors: [' '] },
       ]);
+      toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại!');
     } finally {
       setLoading(false);
     }
@@ -80,7 +79,10 @@ const LoginForm = ({ onSwitch }) => {
         </Form.Item>
 
         <p className="text-center">
-          Chưa có tài khoản? <button className="text-blue-500 hover:text-blue-700" onClick={onSwitch}>Đăng ký</button>
+          Chưa có tài khoản?{' '}
+          <button className="text-blue-500 hover:text-blue-700" onClick={onSwitch}>
+            Đăng ký
+          </button>
         </p>
       </Form>
     </Card>
@@ -110,21 +112,19 @@ const RegisterForm = ({ onSwitch }) => {
       const token = loginRes.data.token;
       const userId = loginRes.data.userId;
 
-      login(token); // Cập nhật AuthContext và localStorage
-      localStorage.setItem('userId', userId); // Optional: lưu userId riêng
-
-      message.success('Đăng ký & đăng nhập thành công!');
-      navigate(`/create-profile?id=${userId}`);
+      login(token);
+      localStorage.setItem('userId', userId);
+      toast.success('Đăng ký & đăng nhập thành công!');
+      setTimeout(() => {
+        navigate(`/create-profile?id=${userId}`);
+      }, 3000);
     } catch (err) {
       if (err.response?.status === 409) {
         form.setFields([
-          {
-            name: 'email',
-            errors: ['Email đã được sử dụng'],
-          },
+          { name: 'email', errors: ['Email đã được sử dụng'] },
         ]);
       } else {
-        message.error(err.response?.data?.message || 'Lỗi đăng ký');
+        toast.error(err.response?.data?.message || 'Lỗi đăng ký');
       }
     } finally {
       setLoading(false);
@@ -175,7 +175,10 @@ const RegisterForm = ({ onSwitch }) => {
         </Form.Item>
 
         <p className="mx-auto text-center">
-          Đã có tài khoản? <button className="text-blue-500 hover:text-blue-700" onClick={onSwitch}>Đăng nhập</button>
+          Đã có tài khoản?{' '}
+          <button className="text-blue-500 hover:text-blue-700" onClick={onSwitch}>
+            Đăng nhập
+          </button>
         </p>
       </Form>
     </Card>

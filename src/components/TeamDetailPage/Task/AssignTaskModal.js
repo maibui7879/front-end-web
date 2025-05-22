@@ -19,6 +19,7 @@ const AssignTaskModal = ({ visible, onCancel, taskId, teamId, onAssignSuccess })
         });
 
         const memberList = res.data || [];
+        
         const userProfiles = await Promise.all(
           memberList.map(async (member) => {
             try {
@@ -44,6 +45,13 @@ const AssignTaskModal = ({ visible, onCancel, taskId, teamId, onAssignSuccess })
     fetchUsers();
   }, [visible, teamId]);
 
+  // Reset selected user khi modal đóng
+  useEffect(() => {
+    if (!visible) {
+      setSelectedUserId(null);
+    }
+  }, [visible]);
+
   const handleAssign = async () => {
     if (!selectedUserId) {
       message.warning('Vui lòng chọn người được phân công');
@@ -57,8 +65,8 @@ const AssignTaskModal = ({ visible, onCancel, taskId, teamId, onAssignSuccess })
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       message.success('Phân công công việc thành công');
-      onAssignSuccess();
       onCancel();
+      window.location.reload();  // reload trang
     } catch {
       message.error('Lỗi khi phân công công việc');
     } finally {
@@ -75,8 +83,8 @@ const AssignTaskModal = ({ visible, onCancel, taskId, teamId, onAssignSuccess })
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       message.success('Đã hủy phân công');
-      onAssignSuccess();
       onCancel();
+      window.location.reload(); // reload trang
     } catch {
       message.error('Lỗi khi hủy phân công');
     } finally {

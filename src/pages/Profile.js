@@ -112,21 +112,21 @@ const Profile = () => {
               column={2}
               className="custom-descriptions"
             >
-              <Descriptions.Item label="📞 Số điện thoại">
+              <Descriptions.Item label="Số điện thoại">
                 {user.phone_number || 'Chưa cập nhật'}
               </Descriptions.Item>
-              <Descriptions.Item label="👤 Giới tính">
+              <Descriptions.Item label="Giới tính">
                 {user.gender || 'Chưa cập nhật'}
               </Descriptions.Item>
-              <Descriptions.Item label="🎂 Ngày sinh">
+              <Descriptions.Item label="Ngày sinh">
                 {user.date_of_birth
                   ? new Date(user.date_of_birth).toLocaleDateString('vi-VN')
                   : 'Chưa cập nhật'}
               </Descriptions.Item>
-              <Descriptions.Item label="🏡 Địa chỉ">
+              <Descriptions.Item label="Địa chỉ">
                 {user.address || 'Chưa cập nhật'}
               </Descriptions.Item>
-              <Descriptions.Item label="📝 Giới thiệu" span={2}>
+              <Descriptions.Item label="Giới thiệu" span={2}>
                 {user.bio || 'Chưa có thông tin giới thiệu.'}
               </Descriptions.Item>
             </Descriptions>

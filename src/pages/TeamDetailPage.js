@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import { Typography, Spin, message, Button, Divider } from 'antd';
-import { MenuOutlined } from '@ant-design/icons';
-import TeamCreator from '../components/TeamCreator';
-import TeamMemberList from '../components/TeamMemberList';
-import InviteMemberModal from '../components/InviteMemberModal';
-import TeamSetting from '../components/TeamSetting';
-import TeamTaskList from '../components/TeamTaskList';
+import { Typography, Spin, message, Divider } from 'antd';
+import TeamMemberList from '../components/TeamDetailPage/TeamMemberList';
+import InviteMemberModal from '../components/TeamDetailPage/InviteMemberModal';
+import TeamSetting from '../components/TeamDetailPage/TeamSetting';
+import TeamTaskList from '../components/TeamDetailPage/Task/TeamTaskList';
 
 const { Title, Text } = Typography;
 
@@ -20,7 +18,6 @@ const TeamDetailPage = () => {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
-  const [sidebarVisible, setSidebarVisible] = useState(true);
 
   const activeTab = searchParams.get('tab') || 'members';
 
@@ -74,10 +71,6 @@ const TeamDetailPage = () => {
     }
   };
 
-  const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible);
-  };
-
   if (loading || !team) {
     return (
       <div className="text-center py-10">
@@ -90,7 +83,7 @@ const TeamDetailPage = () => {
     <li>
       <button
         onClick={onClick}
-        className={`flex items-center px-4 py-3 w-full rounded transition font-medium text-base ${
+        className={`flex items-center px-4 py-2 w-full rounded transition font-medium text-sm ${
           danger
             ? 'text-red-500 hover:text-red-600'
             : isActive
@@ -98,7 +91,7 @@ const TeamDetailPage = () => {
             : 'hover:text-blue-700'
         }`}
       >
-        <i className={`fa ${icon} w-6 text-[18px] text-center mr-4`} />
+        <i className={`fa ${icon} w-6 text-[16px] text-center mr-3`} />
         <span>{label}</span>
       </button>
     </li>
@@ -106,13 +99,18 @@ const TeamDetailPage = () => {
 
   return (
     <div className="flex max-w-7xl mx-auto">
-      <div className={`flex-1 mr-80 ${sidebarVisible ? 'mr-80' : 'mr-8'} `}>
+      <div className="flex-1 mr-80">
         <Title level={2}>{team.name}</Title>
         <Text type="secondary">{team.description}</Text>
 
-        <div className="mt-4">
-          <TeamCreator creator={creator} />
-        </div>
+        {creator && (
+          <Text italic type="secondary" style={{ fontSize: 12, display: 'block', marginTop: 4 }}>
+            Nhóm được tạo bởi{' '}
+            <span className="font-bold">
+              {creator.full_name || creator.username || 'người dùng'}
+            </span>
+          </Text>
+        )}
 
         {activeTab === 'members' && (
           <div className="mt-6">
@@ -140,19 +138,27 @@ const TeamDetailPage = () => {
         />
       </div>
 
-      <div className={`w-80 p-4 bg-white/60 rounded-lg shadow-lg fixed right-0 top-0 h-full ${sidebarVisible ? '' : 'hidden'}`}>
+      <div className="w-80 p-4 bg-white/60 rounded-lg shadow-lg fixed right-0 top-0 h-full overflow-auto">
         <div className="flex flex-col items-center mb-6 mt-32">
           <img
             src={team.avatar_url || '/default-avatar.png'}
             alt={team.name}
             className="rounded-full w-20 h-20 object-cover mb-4"
           />
-          <Title level={4}>{team.name}</Title>
-          <Text type="secondary">{team.description}</Text>
+          <Title level={4} style={{ fontSize: 16, marginBottom: 0 }}>
+            {team.name}
+          </Title>
+          <Text type="secondary" style={{ fontSize: 12, textAlign: 'center' }}>
+            {team.description}
+          </Text>
         </div>
 
-        <Divider />
-        <ul className="space-y-2 px-2">
+        <Divider style={{ marginTop: 0 }} />
+
+        <div style={{ fontSize: 12, fontWeight: '600', paddingLeft: 16, color: '#555' }}>
+          Nhóm thông tin
+        </div>
+        <ul className="space-y-1 px-1 mt-1 mb-4">
           <SidebarButton
             icon="fa-users"
             label="Xem thành viên"
@@ -165,6 +171,14 @@ const TeamDetailPage = () => {
             isActive={activeTab === 'tasks'}
             onClick={() => setActiveTab('tasks')}
           />
+        </ul>
+
+        <Divider />
+
+        <div style={{ fontSize: 12, fontWeight: '600', paddingLeft: 16, color: '#555' }}>
+          Cài đặt nhóm
+        </div>
+        <ul className="space-y-1 px-1 mt-1 mb-4">
           <SidebarButton
             icon="fa-cog"
             label="Cài đặt"
@@ -174,16 +188,6 @@ const TeamDetailPage = () => {
           <SidebarButton icon="fa-trash" label="Xóa nhóm" danger onClick={handleDeleteTeam} />
         </ul>
       </div>
-
-      <button
-        className={`fixed top-15 z-50 transition-all duration-300 mr-4 
-          ${sidebarVisible ? 'right-80' : 'right-8'} 
-          border border-gray-300 shadow-md bg-white rounded-lg p-2 
-          hover:shadow-lg hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500`}
-        onClick={toggleSidebar}
-      >
-        <MenuOutlined />
-      </button>
     </div>
   );
 };
