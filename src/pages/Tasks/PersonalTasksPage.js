@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import TaskForm from '../../components/TaskForm';
-import TaskItem from '../../components/TaskItem';
-import TaskDetails from '../../components/TaskDetails';
+import TaskForm from '../../components/Tasks/TaskForm';
+import TaskItem from '../../components/Tasks/TaskItem';
+import TaskDetails from '../../components/Tasks/TaskDetails';
 
 const PersonalTaskPage = () => {
     const [tasks, setTasks] = useState([]);

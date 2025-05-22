@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Button, Table, Tag, Typography, message, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import AssignTaskModal from './AssignTaskModal';
-import CreateTaskModal from './CreateTaskModal';
+import CreateTaskModal from './Tasks/CreateTaskModal';
 
 const { Title } = Typography;
 
