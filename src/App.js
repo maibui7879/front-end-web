@@ -2,15 +2,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './layouts/Sidebar/Sidebar';
 import Topbar from './layouts/components/Header/Topbar';
-import HomePage from './pages/Home/HomePage';
-import TeamPage from './pages/Teams/TeamPage';
-import Profile from './pages/UserCRUD/Profile';
-import PersonalTasksPage from './pages/Tasks/PersonalTasksPage';
-import AuthPage from './pages/AuthPage/AuthPage';
+import { publicRoutes, privateRoutes } from './routes';
 import CreateProfilePage from './pages/UserCRUD/CreateProfilePage';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
-import TeamDetailPage from './pages/Teams/TeamDetailPage';
-import ProfileId from './pages/UserCRUD/ProfileId';
+
 const AppLayout = ({ children, sidebarOpen, toggleSidebar }) => (
     <div
         className="min-h-screen flex"
@@ -60,54 +55,28 @@ const Main = ({ sidebarOpen, toggleSidebar }) => {
         <>
             {isFullPage ? (
                 <Routes>
-                    <Route path="/" element={<AuthPage />} />
+                    {publicRoutes.map((route, index) => {
+                        const Page = route.component;
+                        return <Route key={index} path={route.path} element={<Page />} />;
+                    })}
                 </Routes>
             ) : (
                 <AppLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
                     <Routes>
-                        <Route path="/home" element={<Navigate to="/home" replace />} />
-                        <Route
-                            path="/home"
-                            element={
-                                <ProtectedRoute>
-                                    <HomePage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/team"
-                            element={
-                                <ProtectedRoute>
-                                    <TeamPage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/profile"
-                            element={
-                                <ProtectedRoute>
-                                    <Profile />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/teams/:id"
-                            element={
-                                <ProtectedRoute>
-                                    <TeamDetailPage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/personal-tasks"
-                            element={
-                                <ProtectedRoute>
-                                    <PersonalTasksPage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route path="/create-profile" element={<CreateProfilePage />} />
-                        <Route path="/profile/:id" element={<ProfileId />} />
+                        {privateRoutes.map((route, index) => {
+                            const Page = route.component;
+                            return (
+                                <Route
+                                    key={index}
+                                    path={route.path}
+                                    element={
+                                        <ProtectedRoute>
+                                            <Page />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                            );
+                        })}
                     </Routes>
                 </AppLayout>
             )}
