@@ -28,8 +28,8 @@
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "prepare": "husky install",
-        "lint": "eslint . --fix",
-        "format": "prettier --write ."
+        "lint": "eslint \"src/**/*.{js,jsx}\" --fix --cache --cache-strategy content --cache-location ./node_modules/.cache/eslint",
+        "format": "prettier --cache --write \"src/**/*.{js,jsx,json,css,md}\""
     },
     "eslintConfig": {
         "extends": [
