@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { Form, Input, Button, Checkbox, Typography, Card, Row, Col, message } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext'; // Đường dẫn đúng với dự án của bạn
+import { AuthContext } from '../../contexts/AuthContext';
+import { loginApi, registerApi } from '../../services/auth';
 
 const { Title, Text } = Typography;
 
@@ -16,21 +16,20 @@ const LoginForm = ({ onSwitch }) => {
     const handleLogin = async (values) => {
         setLoading(true);
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', values);
-            login(res.data.token); // Cập nhật AuthContext và localStorage
-            message.success(res.data.message || 'Đăng nhập thành công!');
+            const res = await loginApi(values.email, values.password);
+            if (!res.success) {
+                form.setFields([
+                    { name: 'email', errors: ['Sai tài khoản hoặc mật khẩu'] },
+                    { name: 'password', errors: [' '] },
+                ]);
+                return;
+            }
+
+            login(res.data.token);
+            message.success(res.message || 'Đăng nhập thành công!');
             navigate('/home');
-        } catch (err) {
-            form.setFields([
-                {
-                    name: 'email',
-                    errors: ['Sai tài khoản hoặc mật khẩu'],
-                },
-                {
-                    name: 'password',
-                    errors: [' '],
-                },
-            ]);
+        } catch (error) {
+            message.error('Lỗi hệ thống, vui lòng thử lại.');
         } finally {
             setLoading(false);
         }
@@ -45,7 +44,7 @@ const LoginForm = ({ onSwitch }) => {
                 <Text className="text-base">Đăng nhập tài khoản</Text>
             </Title>
 
-            <Form layout="vertical" onFinish={handleLogin} form={form}>
+            <Form layout="vertical" form={form} onFinish={handleLogin}>
                 <Form.Item
                     label="Địa chỉ email"
                     name="email"
@@ -99,36 +98,31 @@ const RegisterForm = ({ onSwitch }) => {
     const handleRegister = async (values) => {
         setLoading(true);
         try {
-            await axios.post('http://localhost:5000/api/auth/register', {
-                email: values.email,
-                password: values.password,
-                full_name: values.full_name,
-            });
+            const res = await registerApi(values.email, values.password, values.full_name);
 
-            const loginRes = await axios.post('http://localhost:5000/api/auth/login', {
-                email: values.email,
-                password: values.password,
-            });
-
-            const token = loginRes.data.token;
-            const userId = loginRes.data.userId;
-
-            login(token); // Cập nhật AuthContext và localStorage
-            localStorage.setItem('userId', userId); // Optional: lưu userId riêng
-
-            message.success('Đăng ký & đăng nhập thành công!');
-            navigate(`/create-profile?id=${userId}`);
-        } catch (err) {
-            if (err.response?.status === 409) {
-                form.setFields([
-                    {
-                        name: 'email',
-                        errors: ['Email đã được sử dụng'],
-                    },
-                ]);
-            } else {
-                message.error(err.response?.data?.message || 'Lỗi đăng ký');
+            if (!res.success) {
+                if (res.message?.toLowerCase().includes('email')) {
+                    form.setFields([{ name: 'email', errors: [res.message] }]);
+                } else {
+                    message.error(res.message || 'Lỗi đăng ký');
+                }
+                return;
             }
+
+            // Đăng nhập ngay sau khi đăng ký thành công
+            const loginRes = await loginApi(values.email, values.password);
+            if (!loginRes.success) {
+                message.error(loginRes.message || 'Lỗi đăng nhập sau khi đăng ký');
+                return;
+            }
+
+            login(loginRes.data.token);
+            localStorage.setItem('userId', loginRes.data.userId);
+
+            message.success('Đăng ký và đăng nhập thành công!');
+            navigate(`/create-profile?id=${loginRes.data.userId}`);
+        } catch (error) {
+            message.error('Lỗi hệ thống, vui lòng thử lại.');
         } finally {
             setLoading(false);
         }
@@ -143,7 +137,7 @@ const RegisterForm = ({ onSwitch }) => {
                 <Text className="text-base">Đăng ký tài khoản</Text>
             </Title>
 
-            <Form layout="vertical" onFinish={handleRegister} form={form}>
+            <Form layout="vertical" form={form} onFinish={handleRegister}>
                 <Form.Item
                     label="Họ và tên"
                     name="full_name"
@@ -187,5 +181,4 @@ const RegisterForm = ({ onSwitch }) => {
         </Card>
     );
 };
-
 export { LoginForm, RegisterForm };

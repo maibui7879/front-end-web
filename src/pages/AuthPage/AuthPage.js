@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Row, Col, Button, Typography } from 'antd';
-import { LoginForm, RegisterForm } from '../../components/Forms';
+import { LoginForm, RegisterForm } from '../../components/Auth/AuthForm';
 
 const { Title } = Typography;
 

@@ -25,17 +25,15 @@ async function apiRequest(endpoint, method = 'GET', body = null, requiresAuth = 
         const response = await fetch(`${process.env.BASE_URL}${endpoint}`, options);
         const data = await response.json();
 
-        if (!response.ok) {
+        if (response.status < 200 || response.status >= 300) {
             return {
                 success: false,
-                status: response.status,
                 message: data.message || data.error || 'Đã xảy ra lỗi không xác định.',
             };
         }
 
         return {
             success: true,
-            status: response.status,
             data,
         };
     } catch (error) {
