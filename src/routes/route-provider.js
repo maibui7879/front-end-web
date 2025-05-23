@@ -3,7 +3,7 @@
 import { useContext, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { AuthContext } from "../contexts/AuthContext"
-import AppLayout from "../Layout/AppLayout"
+import AppLayout from "../layouts/AppLayout"
 import { AuthRoutes, AppRoutes } from "./index"
 
 const RouteProvider = ({ sidebarOpen, toggleSidebar }) => {

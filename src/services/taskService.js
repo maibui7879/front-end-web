@@ -1,80 +1,78 @@
-const API_BASE_URL = "http://localhost:5000/api"
+import axios from "axios"
+import API_BASE_URL from "./api"
 
-// Get all personal tasks
+const getToken = () => localStorage.getItem("token")
+
+const getAuthHeaders = () => ({
+  Authorization: `Bearer ${getToken()}`,
+})
+
 export const fetchPersonalTasks = async () => {
-  const token = localStorage.getItem("token")
-
-  const response = await fetch(`${API_BASE_URL}/tasks`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || `Error ${response.status}: Failed to fetch tasks`)
+  try {
+    const res = await axios.get(`${API_BASE_URL}/tasks`, {
+      headers: getAuthHeaders(),
+    })
+    return res.data
+  } catch (error) {
+    const msg =
+      error.response?.data?.message ||
+      `Error ${error.response?.status || ""}: Failed to fetch tasks`
+    throw new Error(msg)
   }
-
-  return response.json()
 }
 
-// Create a new task
+export const fetchTeamTasks = async (teamId) => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/tasks/team/${teamId}`, {
+      headers: getAuthHeaders(),
+    })
+    return res.data
+  } catch (error) {
+    const msg =
+      error.response?.data?.message ||
+      `Error ${error.response?.status || ""}: Failed to fetch team tasks`
+    throw new Error(msg)
+  }
+}
+
 export const createTask = async (taskData) => {
-  const token = localStorage.getItem("token")
-
-  const response = await fetch(`${API_BASE_URL}/tasks`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(taskData),
-  })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || "Failed to create task")
+  try {
+    const res = await axios.post(`${API_BASE_URL}/tasks`, taskData, {
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
+    })
+    return res.data
+  } catch (error) {
+    const msg = error.response?.data?.message || "Failed to create task"
+    throw new Error(msg)
   }
-
-  return response.json()
 }
 
-// Update an existing task
 export const updateTask = async (taskId, taskData) => {
-  const token = localStorage.getItem("token")
-
-  const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(taskData),
-  })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || "Failed to update task")
+  try {
+    const res = await axios.put(`${API_BASE_URL}/tasks/${taskId}`, taskData, {
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
+    })
+    return res.data
+  } catch (error) {
+    const msg = error.response?.data?.message || "Failed to update task"
+    throw new Error(msg)
   }
-
-  return response.json()
 }
 
-// Delete a task
 export const deleteTask = async (taskId) => {
-  const token = localStorage.getItem("token")
-
-  const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || "Failed to delete task")
+  try {
+    await axios.delete(`${API_BASE_URL}/tasks/${taskId}`, {
+      headers: getAuthHeaders(),
+    })
+    return true
+  } catch (error) {
+    const msg = error.response?.data?.message || "Failed to delete task"
+    throw new Error(msg)
   }
-
-  return true
 }

@@ -4,11 +4,11 @@ import { useEffect, useState, useContext } from "react"
 import { Form, message, Typography, Card, Row, Col } from "antd"
 import dayjs from "dayjs"
 import { useNavigate } from "react-router-dom"
-import { AuthContext } from "../contexts/AuthContext"
-import ProfileAvatar from "../components/profile/ProfileAvatar"
-import ProfileForm from "../components/profile/ProfileForm"
-import { fetchProfile, updateProfile } from "../services/api"
-import { uploadImage } from "../services/cloudinary"
+import { AuthContext } from "../../contexts/AuthContext"
+import ProfileAvatar from "../../components/profile/ProfileAvatar"
+import ProfileForm from "../../components/profile/ProfileForm"
+import { fetchProfile, updateProfile } from "../../services/authService"
+import { uploadImage } from "../../services/cloudinary"
 
 const { Title } = Typography
 

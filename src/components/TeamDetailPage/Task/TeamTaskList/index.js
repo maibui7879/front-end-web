@@ -6,7 +6,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { sortByKey } from '../../../../utils/sortUtils';
 import CreateTaskModal from './CreateTaskModal';
 import AssignTaskModal from './AssignTaskModal';
-import useTeamTasks from '../../../../hooks/useTeamTask';
+import useTasks from '../../../../hooks/useTasks';
 import useAssignHistory from '../../../../hooks/useAssignHistory';
 import useEditableCell from '../../../../hooks/useEditableCell';
 
@@ -15,7 +15,7 @@ import TeamTaskColumns from './TeamTaskColumns';
 const { Title } = Typography;
 
 const TeamTaskList = ({ teamId }) => {
-  const { tasks, loading, fetchTasks } = useTeamTasks(teamId);
+  const { tasks, loading, fetchTasks } = useTasks(teamId);
   const { assignHistory, fetchAssignComments } = useAssignHistory(tasks);
   const { editingKey, form, edit, cancel, save } = useEditableCell(fetchTasks);
 

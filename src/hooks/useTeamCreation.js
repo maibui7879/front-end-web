@@ -6,9 +6,9 @@ import {
   createTeam,
   updateTeamAvatar,
   deleteTeam,
-  searchUsers,
   inviteUserToTeam,
-} from "../services/api"
+} from "../services/teamService"
+import { searchUsers} from "../services/authService"
 import { uploadImage } from "../services/cloudinary"
 
 const useTeamCreation = (onTeamCreated, onAvatarUploaded, onClose) => {

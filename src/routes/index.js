@@ -5,16 +5,15 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 import { AuthContext } from "../contexts/AuthContext"
 
 // Pages
-import HomePage from "../pages/HomePage"
 import TeamPage from "../pages/Teams/TeamPage"
 import Profile from "../pages/Users/Profile"
-import PersonalTasksPage from "../pages/PersonalTasksPage"
+import HomePage from "../pages/HomePage"
 import AuthPage from "../pages/Users/AuthPage"
-import CreateProfilePage from "../pages/CreateProfilePage"
+import CreateProfilePage from "../pages/Users/CreateProfilePage"
 import TeamDetailPage from "../pages/Teams/TeamDetailPage"
 import ProfileId from "../pages/Users/ProfileId"
 import CalendarPage from "../pages/CalendarPage"
-// Protected route wrapper
+import PersonalTasksPage from "../pages/PersonalTasksPage"
 const ProtectedRoute = ({ children }) => {
   const { token } = useContext(AuthContext)
   const location = useLocation()
@@ -26,7 +25,6 @@ const ProtectedRoute = ({ children }) => {
   return <>{children}</>
 }
 
-// Auth routes - full page without layout
 export const AuthRoutes = () => {
   return (
     <Routes>

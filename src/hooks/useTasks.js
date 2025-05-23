@@ -1,21 +1,24 @@
-"use client"
-
 import { useState, useEffect, useCallback } from "react"
-import { fetchPersonalTasks, createTask, updateTask, deleteTask } from "../services/taskService"
+import { fetchPersonalTasks, fetchTeamTasks, createTask, updateTask, deleteTask } from "../services/taskService"
 import { formatDateTime, formatDateTimeForAPI } from "../utils/dateUtils"
+import { message } from "antd"
 
-const useTasks = () => {
+const useTasks = (teamId = null) => {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  // Fetch all tasks
   const fetchTasks = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const data = await fetchPersonalTasks()
+      let data
+      if (teamId) {
+        data = await fetchTeamTasks(teamId)
+      } else {
+        data = await fetchPersonalTasks()
+      }
 
       if (Array.isArray(data.personalTasks)) {
         const formattedTasks = data.personalTasks.map((task) => ({
@@ -29,56 +32,53 @@ const useTasks = () => {
         throw new Error("Invalid data format from API")
       }
     } catch (err) {
-      console.error("Error fetching tasks:", err)
       setError(err.message)
+      message.error(teamId ? "Không thể tải danh sách task nhóm" : "Không thể tải danh sách task cá nhân")
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [teamId])
 
-  // Save a task (create or update)
   const saveTask = useCallback(
     async (task) => {
       const isEditing = !!task.id
-
       const formattedTask = {
         ...task,
-        start_day: task.start_time ? formatDateTimeForAPI(task.start_time) : null,
-        end_day: task.end_time ? formatDateTimeForAPI(task.end_time) : null,
+        start_time: task.start_time ? formatDateTimeForAPI(task.start_time) : null,
+        end_time: task.end_time ? formatDateTimeForAPI(task.end_time) : null,
       }
-
       try {
         if (isEditing) {
           await updateTask(task.id, formattedTask)
         } else {
           await createTask(formattedTask)
         }
-
         await fetchTasks()
         return true
       } catch (err) {
-        console.error("Error saving task:", err)
         setError(err.message)
+        message.error("Lỗi khi lưu task")
         return false
       }
     },
     [fetchTasks],
   )
 
-  // Delete a task
-  const removeTask = useCallback(async (taskId) => {
-    try {
-      await deleteTask(taskId)
-      setTasks((prevTasks) => prevTasks.filter((t) => t.id !== taskId))
-      return true
-    } catch (err) {
-      console.error("Error deleting task:", err)
-      setError(err.message)
-      return false
-    }
-  }, [])
+  const removeTask = useCallback(
+    async (taskId) => {
+      try {
+        await deleteTask(taskId)
+        setTasks((prev) => prev.filter((t) => t.id !== taskId))
+        return true
+      } catch (err) {
+        setError(err.message)
+        message.error("Lỗi khi xóa task")
+        return false
+      }
+    },
+    [],
+  )
 
-  // Load tasks on component mount
   useEffect(() => {
     fetchTasks()
   }, [fetchTasks])
