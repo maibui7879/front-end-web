@@ -1,55 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Select, message, Button, Space } from 'antd';
+import useTeamMembers from '../../../../hooks/useTeamMember';
 import axios from 'axios';
-
 const { Option } = Select;
 
 const AssignTaskModal = ({ visible, onCancel, taskId, teamId, onAssignSuccess }) => {
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
+  const { members: users, loading: userLoading, error } = useTeamMembers(teamId);
+
   useEffect(() => {
-    if (!visible || !teamId) return;
-
-    const fetchUsers = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5000/api/teams/${teamId}/members`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        });
-
-        const memberList = res.data || [];
-        
-        const userProfiles = await Promise.all(
-          memberList.map(async (member) => {
-            try {
-              const profileRes = await axios.get(`http://localhost:5000/api/user/profile/${member.id}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-              });
-              return {
-                id: member.id,
-                name: profileRes.data.profile.full_name || 'Không tên',
-              };
-            } catch {
-              return { id: member.id, name: 'Không thể tải tên' };
-            }
-          })
-        );
-
-        setUsers(userProfiles);
-      } catch {
-        message.error('Không tải được danh sách thành viên');
-      }
-    };
-
-    fetchUsers();
-  }, [visible, teamId]);
-
-  // Reset selected user khi modal đóng
-  useEffect(() => {
-    if (!visible) {
-      setSelectedUserId(null);
+    if (error) {
+      message.error('Không tải được danh sách thành viên');
     }
+  }, [error]);
+
+  useEffect(() => {
+    if (!visible) setSelectedUserId(null);
   }, [visible]);
 
   const handleAssign = async () => {
@@ -66,7 +34,7 @@ const AssignTaskModal = ({ visible, onCancel, taskId, teamId, onAssignSuccess })
       );
       message.success('Phân công công việc thành công');
       onCancel();
-      window.location.reload();  // reload trang
+      window.location.reload();
     } catch {
       message.error('Lỗi khi phân công công việc');
     } finally {
@@ -84,7 +52,7 @@ const AssignTaskModal = ({ visible, onCancel, taskId, teamId, onAssignSuccess })
       );
       message.success('Đã hủy phân công');
       onCancel();
-      window.location.reload(); // reload trang
+      window.location.reload();
     } catch {
       message.error('Lỗi khi hủy phân công');
     } finally {
@@ -95,7 +63,7 @@ const AssignTaskModal = ({ visible, onCancel, taskId, teamId, onAssignSuccess })
   return (
     <Modal
       title="Phân công công việc"
-      visible={visible}
+      open={visible}
       onCancel={onCancel}
       footer={
         <Space>
@@ -116,11 +84,12 @@ const AssignTaskModal = ({ visible, onCancel, taskId, teamId, onAssignSuccess })
         style={{ width: '100%' }}
         onChange={(value) => setSelectedUserId(value)}
         value={selectedUserId}
+        loading={userLoading}
         allowClear
       >
         {users.map((user) => (
           <Option key={user.id} value={user.id}>
-            {user.name}
+            {user.full_name || user.name || 'Không tên'}
           </Option>
         ))}
       </Select>

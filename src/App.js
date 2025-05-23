@@ -4,31 +4,28 @@ import { useState, useEffect } from "react"
 import { BrowserRouter as Router } from "react-router-dom"
 import { AuthProvider } from "./contexts/AuthContext"
 import RouteProvider from "./routes/route-provider"
-import 'antd/dist/reset.css';
+import 'antd/dist/reset.css'
+
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    const checkMobile = () => {
-      if (window.innerWidth <= 768) {
-        setIsMobile(true)
-        setSidebarOpen(false)
-      } else {
-        setIsMobile(false)
-        setSidebarOpen(true)
-      }
+    const updateResponsive = () => {
+      const mobile = window.innerWidth <= 768
+      setIsMobile(mobile)
+      setSidebarOpen(!mobile)
     }
 
-    checkMobile()
-    window.addEventListener("resize", checkMobile)
+    updateResponsive()
+    window.addEventListener("resize", updateResponsive)
 
-    return () => window.removeEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", updateResponsive)
   }, [])
 
   const toggleSidebar = () => {
     if (!isMobile) {
-      setSidebarOpen(!sidebarOpen)
+      setSidebarOpen(prev => !prev)
     }
   }
 

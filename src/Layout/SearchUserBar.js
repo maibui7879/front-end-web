@@ -1,61 +1,92 @@
-import React, { useState, useContext } from 'react';
-import { Select, Spin } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
+import React from "react"
+import { Select, Spin, Avatar } from "antd"
+import { useNavigate } from "react-router-dom"
+import { FiSearch } from "react-icons/fi"
+import useSearch from "../hooks/useSearch"
+import { getInitials } from "../utils/getInitialsAvatar"
 
-const { Option } = Select;
+const { Option } = Select
 
 const SearchUserBar = () => {
-  const [searchUsers, setSearchUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { token } = useContext(AuthContext);
+  const {
+    searchUsers,
+    loading,
+    selectedUser,
+    handleSearch,
+    handleSelect,
+  } = useSearch()
+  const navigate = useNavigate()
 
-  const handleSearch = async (value) => {
-    if (!value.trim()) {
-      setSearchUsers([]);
-      return;
-    }
+  const handleSearchClick = () => {
+    if (selectedUser) navigate(`/profile/${selectedUser}`)
+  }
 
-    setLoading(true);
-    try {
-      const res = await fetch(`http://localhost:5000/api/user/search?searchTerm=${encodeURIComponent(value)}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) throw new Error('Search failed');
-
-      const data = await res.json();
-      setSearchUsers(data.users || []);
-    } catch (err) {
-      console.error('Lỗi tìm kiếm:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSelect = (userId) => {
-    if (userId) navigate(`/profile/${userId}`);
-  };
+  const handleNameClick = (e, userId) => {
+    e.stopPropagation()
+    navigate(`/profile/${userId}`)
+  }
 
   return (
-    <Select
-      showSearch
-      placeholder="Tìm người dùng..."
-      onSearch={handleSearch}
-      onSelect={handleSelect}
-      filterOption={false}
-      notFoundContent={loading ? <Spin size="small" /> : 'Không tìm thấy'}
-      className="w-64 md:w-80"
-      allowClear
-    >
-      {searchUsers.map((user) => (
-        <Option key={user.id} value={user.id}>
-          {user.full_name} ({user.email}) - {user.phone_number}
-        </Option>
-      ))}
-    </Select>
-  );
-};
+    <div className="relative w-full md:w-80">
+      <Select
+        showSearch
+        value={selectedUser}
+        placeholder="Tìm người dùng..."
+        onSearch={handleSearch}
+        onSelect={handleSelect}
+        filterOption={false}
+        notFoundContent={loading ? <Spin size="small" /> : "Không tìm thấy"}
+        className="w-full"
+        allowClear={false}
+        optionLabelProp="label"
+        suffixIcon={null}
+      >
+        {searchUsers.map((user) => {
+          const fullName = user.full_name || "Không tên"
+          const initials = getInitials(fullName)
 
-export default SearchUserBar;
+          return (
+            <Option
+              key={user.id}
+              value={user.id}
+              label={`${fullName} (${user.email})`}
+            >
+              <div className="flex items-center space-x-2">
+                <Avatar
+                  size={24}
+                  src={user.avatar_url || null}
+                  className="bg-gray-200 text-gray-800 text-sm font-semibold"
+                >
+                  {!user.avatar_url && initials}
+                </Avatar>
+                <div className="flex flex-col cursor-pointer">
+                  <span
+                    className="font-semibold hover:underline"
+                    onMouseDown={(e) => handleNameClick(e, user.id)}
+                  >
+                    {fullName}
+                  </span>
+                  <span
+                    className="text-xs text-gray-500 hover:underline"
+                    onMouseDown={(e) => handleNameClick(e, user.id)}
+                  >
+                    {user.email} - {user.phone_number}
+                  </span>
+                </div>
+              </div>
+            </Option>
+          )
+        })}
+      </Select>
+
+      <button
+        onClick={handleSearchClick}
+        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+      >
+        <FiSearch size={18} />
+      </button>
+    </div>
+  )
+}
+
+export default SearchUserBar

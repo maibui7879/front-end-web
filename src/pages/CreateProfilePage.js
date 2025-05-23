@@ -70,7 +70,11 @@ const CreateProfilePage = () => {
 
       await updateProfile(token, data)
       message.success("Cập nhật hồ sơ thành công!")
-      setTimeout(() => navigate("/home"), 1500)
+
+      setTimeout(() => {
+        navigate("/home")
+        window.location.reload()
+      }, 1000)
     } catch (err) {
       console.error(err)
       message.error("Lỗi cập nhật hồ sơ!")
@@ -78,6 +82,7 @@ const CreateProfilePage = () => {
       setLoading(false)
     }
   }
+
 
   return (
     <div className="p-6 min-h-screen">

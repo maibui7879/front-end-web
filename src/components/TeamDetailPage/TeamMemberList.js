@@ -1,109 +1,36 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import React from 'react';
 import { Table, Avatar, Typography, Dropdown, Menu, Modal, Select, message, Button } from 'antd';
-import { EllipsisOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-// import { AuthContext } from '.../contexts/AuthContext'; // bỏ import này theo yêu cầu
 import { FaExclamationTriangle } from 'react-icons/fa';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import useTeamMembers from '../../hooks/useTeamMember';
 
 const { Text } = Typography;
 const { Option } = Select;
 
+const AvatarInitials = ({ initials }) => (
+  <Avatar style={{ backgroundColor: '#87d068' }}>{initials}</Avatar>
+);
+
 const TeamMemberList = ({ onInviteClick, teamId }) => {
-  // Lấy token trực tiếp từ localStorage
-  const token = localStorage.getItem('token');
-  const [members, setMembers] = useState([]);
-  const [roleModalVisible, setRoleModalVisible] = useState(false);
-  const [forbiddenModal, setForbiddenModal] = useState(false);
-  const [selectedMember, setSelectedMember] = useState(null);
-  const [newRole, setNewRole] = useState('');
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [dropdownAnchor, setDropdownAnchor] = useState(null);
   const navigate = useNavigate();
-
-  const avatarNameRefs = useRef({}); // lưu ref cho từng member để dropdown hiển thị cạnh tên
-
-  const fetchMembers = async () => {
-    try {
-      const res = await axios.get(`http://localhost:5000/api/teams/${teamId}/members`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const membersWithAvatar = await Promise.all(
-        res.data.map(async (m) => {
-          try {
-            const prof = await axios.get(`http://localhost:5000/api/user/profile/${m.id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            return { ...m, avatarUrl: prof.data.profile.avatar_url || 'https://i.pravatar.cc/100' };
-          } catch {
-            return { ...m, avatarUrl: 'https://i.pravatar.cc/100' };
-          }
-        })
-      );
-      setMembers(membersWithAvatar);
-    } catch (err) {
-      message.error('Không thể tải danh sách thành viên');
-    }
-  };
-
-  useEffect(() => {
-    if (teamId) fetchMembers();
-  }, [teamId]);
-
-  // Giả định user id lưu ở localStorage (hoặc token decode)
-  const currentUserId = localStorage.getItem('userId');
-  const currentUser = members.find((m) => m.id === currentUserId);
-  const canManage = ['creator', 'admin'].includes(currentUser?.role);
-
-  const confirmRemoveMember = async (member) => {
-    Modal.confirm({
-      title: `Xác nhận xóa thành viên ${member.full_name}?`,
-      okText: 'Xóa',
-      okType: 'danger',
-      cancelText: 'Hủy',
-      onOk: async () => {
-        try {
-          const res = await axios.delete(`http://localhost:5000/api/teams/member/${teamId}/remove/${member.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (res.status === 200) {
-            message.success('Đã xóa thành viên');
-            fetchMembers();
-          } else {
-            message.error('Lỗi khi xóa thành viên');
-          }
-        } catch (err) {
-          message.error('Lỗi khi xóa thành viên');
-        }
-      },
-    });
-  };
-
-  const handleChangeRole = async () => {
-    try {
-      const res = await axios.put(
-        `http://localhost:5000/api/teams/member/${teamId}/change-role/${selectedMember.id}`,
-        { role: newRole },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (res.status === 403) {
-        setForbiddenModal(true);
-        return;
-      }
-
-      message.success('Cập nhật vai trò thành công');
-      setRoleModalVisible(false);
-      fetchMembers();
-    } catch (err) {
-      message.error('Không thể cập nhật vai trò');
-    }
-  };
+  const {
+    members,
+    selectedMember,
+    newRole,
+    roleModalVisible,
+    forbiddenModal,
+    dropdownVisible,
+    dropdownAnchor,
+    canManage,
+    setSelectedMember,
+    setNewRole,
+    setRoleModalVisible,
+    setForbiddenModal,
+    setDropdownVisible,
+    setDropdownAnchor,
+    confirmRemoveMember,
+    handleChangeRole,
+  } = useTeamMembers(teamId);
 
   const menu = (member) => (
     <Menu>
@@ -112,18 +39,18 @@ const TeamMemberList = ({ onInviteClick, teamId }) => {
       </Menu.Item>
       {canManage && (
         <>
-          <Menu.Item
-            key="2"
-            onClick={() => {
-              setSelectedMember(member);
-              setNewRole(member.role);
-              setRoleModalVisible(true);
-              setDropdownVisible(false);
-            }}
-          >
+          <Menu.Item key="2" onClick={() => {
+            setSelectedMember(member);
+            setNewRole(member.role);
+            setRoleModalVisible(true);
+            setDropdownVisible(false);
+          }}>
             Thay đổi vai trò
           </Menu.Item>
-          <Menu.Item key="3" danger onClick={() => { setDropdownVisible(false); confirmRemoveMember(member); }}>
+          <Menu.Item key="3" danger onClick={() => {
+            setDropdownVisible(false);
+            confirmRemoveMember(member);
+          }}>
             Xóa thành viên khỏi nhóm
           </Menu.Item>
         </>
@@ -139,19 +66,13 @@ const TeamMemberList = ({ onInviteClick, teamId }) => {
       render: (text, member) => (
         <div
           style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
-          ref={(el) => {
-            if (el) avatarNameRefs.current[member.id] = el;
-          }}
-          onClick={(e) => {
-            setSelectedMember(member);
-            setDropdownAnchor(avatarNameRefs.current[member.id]);
-            setDropdownVisible(true);
-            e.stopPropagation(); // tránh kích hoạt onRow click nếu có
-          }}
+          onClick={() => navigate(`/profile/${member.id}`)}
         >
-          <Avatar src={member.avatarUrl} alt={text}>
-            {text?.charAt(0)}
-          </Avatar>
+          {member.avatarUrl ? (
+            <Avatar src={member.avatarUrl} />
+          ) : (
+            <AvatarInitials initials={member.initials} />
+          )}
           <Text strong>{text}</Text>
         </div>
       ),
@@ -169,18 +90,10 @@ const TeamMemberList = ({ onInviteClick, teamId }) => {
     <div>
       <div className="flex justify-between items-center mt-8 mb-4">
         <Typography.Title level={4}>Thành viên nhóm</Typography.Title>
-        <Button type="primary" onClick={onInviteClick} disabled={false}>
-          Mời thành viên
-        </Button>
+        <Button type="primary" onClick={onInviteClick}>Mời thành viên</Button>
       </div>
 
-      <Table
-        rowKey="id"
-        columns={columns}
-        dataSource={members}
-        pagination={false} // bỏ footer pagination
-        // bỏ onRow onClick vì đã xử lý click trên avatar + tên
-      />
+      <Table rowKey="id" columns={columns} dataSource={members} pagination={false} />
 
       {selectedMember && dropdownAnchor && (
         <Dropdown
@@ -219,9 +132,7 @@ const TeamMemberList = ({ onInviteClick, teamId }) => {
             Chỉ có <span className="font-semibold">trưởng nhóm</span> mới có quyền thay đổi thông tin hoặc xóa nhóm!
           </p>
           <div className="mt-5">
-            <Button type="primary" onClick={() => setForbiddenModal(false)}>
-              Nuh uh
-            </Button>
+            <Button type="primary" onClick={() => setForbiddenModal(false)}>Nuh uh</Button>
           </div>
         </div>
       </Modal>

@@ -32,7 +32,7 @@ const CreateTeamModal = ({
     handleCancel,
     handleFinish,
     setSelectedUserId,
-  } = useTeamCreation(onCreate, onAvatarUploaded)
+  } = useTeamCreation(onCreate, onAvatarUploaded, onCancel)
 
   const getModalTitle = () => {
     switch (step) {

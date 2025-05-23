@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Form, Input, DatePicker, Select, message } from 'antd';
 import axios from 'axios';
-import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -14,7 +13,7 @@ const CreateTaskModal = ({ visible, onCancel, onCreate, teamId }) => {
     try {
       const values = await form.validateFields();
       setLoading(true);
-      await axios.post(
+      const response = await axios.post(
         'http://localhost:5000/api/tasks',
         {
           title: values.title,
@@ -31,9 +30,13 @@ const CreateTaskModal = ({ visible, onCancel, onCreate, teamId }) => {
           },
         }
       );
-      message.success('Tạo task thành công');
-      form.resetFields();
-      onCreate();
+      if (response.status === 201) {
+        message.success('Tạo task thành công');
+        form.resetFields();
+        onCreate();
+      } else {
+        message.error('Lỗi khi tạo task');
+      }
     } catch (error) {
       if (error.errorFields) return; // validation error, không hiện message
       message.error('Lỗi khi tạo task');

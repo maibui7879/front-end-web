@@ -1,49 +1,28 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Avatar,
+  Button,
   Card,
   Row,
   Col,
   Typography,
   Skeleton,
   Descriptions,
-  message,
 } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
-import { AuthContext } from '../contexts/AuthContext';
+import { EditOutlined } from '@ant-design/icons';
+import useUserProfile from '../../hooks/useUserProfile';
+import { getInitials } from '../../utils/getInitialsAvatar';
 
 const { Title, Text } = Typography;
 
-const ProfileId = () => {
-  const { id } = useParams();
-  const { token } = useContext(AuthContext);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+const Profile = () => {
+  const navigate = useNavigate();
+  const { user, loading } = useUserProfile();
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!token || !id) return;
-
-      try {
-        const res = await fetch(`http://localhost:5000/api/user/profile/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!res.ok) throw new Error('Failed to fetch profile');
-
-        const data = await res.json();
-        setUser(data.profile);
-      } catch (error) {
-        console.error('Lỗi khi lấy hồ sơ:', error);
-        message.error('Không thể tải hồ sơ người dùng.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [token, id]);
+  const handleEdit = () => {
+    navigate('/create-profile');
+  };
 
   if (loading) {
     return (
@@ -69,19 +48,30 @@ const ProfileId = () => {
         bodyStyle={{ padding: 24 }}
       >
         <Title level={3} className="text-center mb-8">
-          👤 Hồ sơ người dùng
+          Hồ sơ cá nhân
         </Title>
 
         <Row gutter={[32, 32]} className="items-center">
           <Col xs={24} md={6} className="text-center">
             <Avatar
               size={100}
-              src={user.avatar_url || 'https://i.pravatar.cc/100'}
-              icon={!user.avatar_url && <UserOutlined />}
-              className="mb-4 shadow-lg"
-            />
-            <Title level={5}>{user.full_name || 'Không tên'}</Title>
-            <Text type="secondary">{user.email || 'Chưa cập nhật email'}</Text>
+              src={user.avatar_url || null}
+              className="mb-4 shadow-lg bg-gray-200 text-gray-800 font-semibold"
+            >
+              {!user.avatar_url && getInitials(user.full_name)}
+            </Avatar>
+            <Title level={5}>{user.full_name}</Title>
+            <Text type="secondary">{user.email}</Text>
+            <div className="mt-4">
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={handleEdit}
+                className="rounded-full px-6 bg-blue-500 hover:bg-blue-600"
+              >
+                Chỉnh sửa hồ sơ
+              </Button>
+            </div>
           </Col>
 
           <Col xs={24} md={18}>
@@ -95,21 +85,21 @@ const ProfileId = () => {
               column={2}
               className="custom-descriptions"
             >
-              <Descriptions.Item label="📞 Số điện thoại">
+              <Descriptions.Item label="Số điện thoại">
                 {user.phone_number || 'Chưa cập nhật'}
               </Descriptions.Item>
-              <Descriptions.Item label="👤 Giới tính">
+              <Descriptions.Item label="Giới tính">
                 {user.gender || 'Chưa cập nhật'}
               </Descriptions.Item>
-              <Descriptions.Item label="🎂 Ngày sinh">
+              <Descriptions.Item label="Ngày sinh">
                 {user.date_of_birth
                   ? new Date(user.date_of_birth).toLocaleDateString('vi-VN')
                   : 'Chưa cập nhật'}
               </Descriptions.Item>
-              <Descriptions.Item label="🏡 Địa chỉ">
+              <Descriptions.Item label="Địa chỉ">
                 {user.address || 'Chưa cập nhật'}
               </Descriptions.Item>
-              <Descriptions.Item label="📝 Giới thiệu" span={2}>
+              <Descriptions.Item label="Giới thiệu" span={2}>
                 {user.bio || 'Chưa có thông tin giới thiệu.'}
               </Descriptions.Item>
             </Descriptions>
@@ -120,4 +110,4 @@ const ProfileId = () => {
   );
 };
 
-export default ProfileId;
+export default Profile;

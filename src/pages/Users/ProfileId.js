@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Avatar,
-  Button,
   Card,
   Row,
   Col,
@@ -11,46 +10,14 @@ import {
   Descriptions,
   message,
 } from 'antd';
-import { EditOutlined, UserOutlined } from '@ant-design/icons';
-import { AuthContext } from '../contexts/AuthContext'; // 👈 Thêm dòng này
+import useUserProfileById from '../../hooks/useUserProfileById';
+import { getInitials } from '../../utils/getInitialsAvatar';
 
 const { Title, Text } = Typography;
 
-const Profile = () => {
-  const navigate = useNavigate();
-  const { token } = useContext(AuthContext); // 👈 Lấy token từ context
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!token) return; // 👈 Nếu chưa có token thì không gọi
-
-      try {
-        const res = await fetch('http://localhost:5000/api/user/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) throw new Error('Failed to fetch profile');
-
-        const data = await res.json();
-        setUser(data);
-      } catch (error) {
-        console.error('Lỗi khi lấy hồ sơ:', error);
-        message.error('Không thể tải hồ sơ người dùng.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [token]); // 👈 gọi lại nếu token thay đổi
-
-  const handleEdit = () => {
-    navigate('/create-profile');
-  };
+const ProfileId = () => {
+  const { id } = useParams();
+  const { user, loading, avatarUrl, fullName } = useUserProfileById(id);
 
   if (loading) {
     return (
@@ -61,6 +28,7 @@ const Profile = () => {
   }
 
   if (!user) {
+    message.error('Không thể tải hồ sơ người dùng.');
     return (
       <div className="p-6 text-center text-red-500">
         Không thể tải hồ sơ người dùng.
@@ -76,29 +44,20 @@ const Profile = () => {
         bodyStyle={{ padding: 24 }}
       >
         <Title level={3} className="text-center mb-8">
-          👤 Hồ sơ cá nhân
+          👤 Hồ sơ người dùng
         </Title>
 
         <Row gutter={[32, 32]} className="items-center">
           <Col xs={24} md={6} className="text-center">
             <Avatar
               size={100}
-              src={user.avatar_url || 'https://i.pravatar.cc/100'}
-              icon={!user.avatar_url && <UserOutlined />}
-              className="mb-4 shadow-lg"
-            />
-            <Title level={5}>{user.full_name}</Title>
-            <Text type="secondary">{user.email}</Text>
-            <div className="mt-4">
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={handleEdit}
-                className="rounded-full px-6 bg-blue-500 hover:bg-blue-600"
-              >
-                Chỉnh sửa hồ sơ
-              </Button>
-            </div>
+              src={avatarUrl || null}
+              className="mb-4 shadow-lg bg-gray-200 text-gray-800 font-semibold"
+            >
+              {!avatarUrl && getInitials(fullName)}
+            </Avatar>
+            <Title level={5}>{fullName}</Title>
+            <Text type="secondary">{user.email || 'Chưa cập nhật email'}</Text>
           </Col>
 
           <Col xs={24} md={18}>
@@ -137,4 +96,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfileId;

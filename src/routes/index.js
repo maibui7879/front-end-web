@@ -6,14 +6,14 @@ import { AuthContext } from "../contexts/AuthContext"
 
 // Pages
 import HomePage from "../pages/HomePage"
-import TeamPage from "../pages/TeamPage"
-import Profile from "../pages/Profile"
+import TeamPage from "../pages/Teams/TeamPage"
+import Profile from "../pages/Users/Profile"
 import PersonalTasksPage from "../pages/PersonalTasksPage"
-import AuthPage from "../pages/AuthPage"
+import AuthPage from "../pages/Users/AuthPage"
 import CreateProfilePage from "../pages/CreateProfilePage"
-import TeamDetailPage from "../pages/TeamDetailPage"
-import ProfileId from "../pages/ProfileId"
-import TestToast from "../TestToast"
+import TeamDetailPage from "../pages/Teams/TeamDetailPage"
+import ProfileId from "../pages/Users/ProfileId"
+import CalendarPage from "../pages/CalendarPage"
 // Protected route wrapper
 const ProtectedRoute = ({ children }) => {
   const { token } = useContext(AuthContext)
@@ -55,14 +55,6 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-    <Route
-        path="/test-toast"
-        element={
-          <ProtectedRoute>
-            <TestToast />
-          </ProtectedRoute>
-        }
-      />
       <Route
         path="/profile"
         element={
@@ -84,6 +76,14 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <PersonalTasksPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/calendar"
+        element={
+          <ProtectedRoute>
+            <CalendarPage />
           </ProtectedRoute>
         }
       />

@@ -9,9 +9,9 @@ import {
   searchUsers,
   inviteUserToTeam,
 } from "../services/api"
-import {uploadImage} from "../services/cloudinary"
+import { uploadImage } from "../services/cloudinary"
 
-const useTeamCreation = (onTeamCreated, onAvatarUploaded) => {
+const useTeamCreation = (onTeamCreated, onAvatarUploaded, onClose) => {
   const [step, setStep] = useState(1)
   const [teamId, setTeamId] = useState(null)
   const [uploading, setUploading] = useState(false)
@@ -37,7 +37,7 @@ const useTeamCreation = (onTeamCreated, onAvatarUploaded) => {
       setTeamId(createdTeamId)
       message.success("Tạo nhóm thành công")
       setStep(2)
-      onTeamCreated(createdTeamId)
+      if (onTeamCreated) onTeamCreated(createdTeamId)
       return true
     } catch (error) {
       message.error("Lỗi khi tạo nhóm")
@@ -49,8 +49,7 @@ const useTeamCreation = (onTeamCreated, onAvatarUploaded) => {
   const handleUploadAvatar = async (file) => {
     try {
       setUploading(true)
-      const response = await uploadImage(file)
-      const url = response.data.secure_url
+      const url = await uploadImage(file)
       setAvatarUrl(url)
 
       const token = getToken()
@@ -122,12 +121,14 @@ const useTeamCreation = (onTeamCreated, onAvatarUploaded) => {
     }
 
     resetState()
+    if (onClose) onClose()
     return true
   }
 
   const handleFinish = () => {
-    onAvatarUploaded()
+    if (onAvatarUploaded) onAvatarUploaded()
     resetState()
+    if (onClose) onClose()
   }
 
   const resetState = () => {
